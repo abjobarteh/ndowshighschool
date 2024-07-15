@@ -88,6 +88,7 @@ include('auto_logout.php');
                         <th style="padding: 5px 8px; font-size: 10px; margin: 5px;">Grade</th>
                         <th style="padding: 5px 8px; font-size: 10px; margin: 5px;">Start Grade Range</th>
                         <th style="padding: 5px 8px; font-size: 10px; margin: 5px;">End Grade Range</th>
+                        <th style="padding: 5px 8px; font-size: 10px; margin: 5px;">Interpretation</th>
                     </tr>
                 </thead>
             </table>
@@ -103,6 +104,7 @@ include('auto_logout.php');
                             <td style="padding: 5px 8px; font-size: 10px; margin: 5px;"><?php echo $row['GRADE']; ?></td>
                             <td style="padding: 5px 8px; font-size: 10px; margin: 5px;"><?php echo $row['START_GRADE_RANGE']; ?></td>
                             <td style="padding: 5px 8px; font-size: 10px; margin: 5px;"><?php echo $row['END_GRADE_RANGE']; ?></td>
+                            <td style="padding: 5px 8px; font-size: 10px; margin: 5px;"><?php echo $row['INTERPRETATION']; ?></td>
                         </tr>
                     <?php
                     }
@@ -125,55 +127,6 @@ include('auto_logout.php');
                 </tr>
             </thead>
         </table>
-
-        <div style="max-height: 200px; overflow-y: auto;">
-            <table class="table-content" style="font-size: 14px; border-collapse: collapse; margin: 10px 0; font: 0.9em; min-width: 400px; border-radius: 5px 5px; overflow: hidden; box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
-                <tbody>
-                    <?php
-                    while ($rows = oci_fetch_array($stid)) {
-                    ?>
-                        <tr style="border-bottom: 1px solid #dddddd;">
-                            <td style="padding: 5px 8px; font-size: 10px; margin: 5px;"><?php echo $rows['GRADE']; ?></td>
-                            <td style="padding: 5px 8px; font-size: 10px; margin: 5px;"><?php echo $rows['GPA']; ?></td>
-                        </tr>
-                    <?php
-                    }
-                    ?>
-                </tbody>
-            </table>
-        </div>
-
-        <?php
-        $sql = "select * from waec_subject a join subject_credit_hrs b on (a.sub_code=b.sub_code) where b.s_id = $sid order by b.CREDIT_HRS desc,a.subject";
-        $stid = oci_parse($conn, $sql);
-        oci_execute($stid);
-        ?>
-       <table class="table-content" style="font-size: 14px; border-collapse: collapse; margin: 10px 0; font: 0.9em; min-width: 400px; border-radius: 5px 5px; overflow: hidden; box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
-    <thead>
-        <tr style="background-color: #909290; color: #ffffff; text-align: left; font-weight: bold;">
-            <th style="padding: 5px 8px; font-size: 10px; margin: 5px;">Subject</th>
-            <th style="padding: 5px 8px; font-size: 10px; margin: 5px;">Credit Hours</th>
-        </tr>
-    </thead>
-</table>
-
-<div style="max-height: 200px; overflow-y: auto;">
-    <table class="table-content" style="font-size: 14px; border-collapse: collapse; margin: 0; font: 0.9em; min-width: 400px; border-radius: 0 0 5px 5px; overflow: hidden; box-shadow: none;">
-        <tbody>
-            <?php
-            while ($rows = oci_fetch_array($stid)) {
-            ?>
-                <tr style="border-bottom: 1px solid #dddddd;">
-                    <td style="padding: 5px 8px; font-size: 10px; margin: 5px;"><?php echo $rows['SUBJECT']; ?></td>
-                    <td style="padding: 5px 8px; font-size: 10px; margin: 5px;"><?php echo $rows['CREDIT_HRS']; ?></td>
-                </tr>
-            <?php
-            }
-            ?>
-        </tbody>
-    </table>
-</div>
-
         <?php
         $sql = oci_parse($conn, "select * from academic_calendar a join term_calendar b on (a.academic_year=b.academic_year) where a.status = 'ACCEPTED' AND b.status = 'ACCEPTED' ");
         oci_execute($sql);
@@ -205,24 +158,6 @@ include('auto_logout.php');
 
                         ?>
         <div>
-            <Label style="font-size: 18px; font-family: sans-serif;
-    font-weight: bold; color: #909290;"></Label>
-            <div class="input-container" style="display: flex;">
-
-                <div class="input-field" style="margin-right: 10px;">
-                    <label>Academic Year</label>
-                    <input type="text" placeholder="<?php echo $a_y ?>" style="width:300px;" readonly>
-                </div>
-                <div class="input-field" style="margin-right: 10px;">
-                    <label>Term</label>
-                    <input type="text" placeholder="<?php echo $t ?>" style="width:300px;" readonly>
-                </div>
-            </div>
-
-            <div class="input-container" style="display: flex;">
-
-            </div>
-
             <Label style="font-size: 18px; font-family: sans-serif;
     font-weight: bold; color: #909290;">Set Letter Grade</Label>
         </div>
@@ -524,228 +459,6 @@ include('auto_logout.php');
 //echo "select * from grade a join gpa b on(a.g_code=b.g_code) where a.s_id = $sid order by b.g_code ";
                         ?>
                         
-        <Label style="font-size: 18px; font-family: sans-serif;
-    font-weight: bold; color: #909290;">Set Grade Point Average</Label>
-        <div class="input-field" style="margin-right: 10px;">
-            <label>Grade</label>
-            <select required name="gpa_letter">
-                <option disabled selected>Select Letter Grade</option>
-                <?php
-                $get_hos = "select * from grade a join gpa b on(a.g_code=b.g_code) where a.s_id = $sid order by b.g_code ";
-                $get = oci_parse(oci_connect($username, $password, $connection), $get_hos);
-                oci_execute($get);
-                while ($row = oci_fetch_array($get)) {
-                ?><option>
-                        <?php echo $row["GRADE"]; ?>
-                    </option> <?php
-                            }
-                                ?>
-            </select>
-            <label>Grade Point Average Equivalent</label>
-            <input type="number" placeholder="Enter Grade Point Average Equivalent" title="Only Numbers" name="gpa" style="width:310px;" pattern="[0-9.]+" step="any">
-            <div style="display: flex;">
-                <button style=" display: inline-block;
-  padding: 6px 12px;
-  background-color: #909290;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  margin-top:10px;
-  margin-bottom:10px;
-  text-decoration: none;" name="set_gpa" type="submit">
-                    SET GPA
-                    <i class="uil uil-create-dashboard"></i>
-                </button>
-            </div>
-        </div>
-        <?php
-        if (isset($_POST['set_gpa'])) {
-            if (isset($_POST['gpa_letter'])) {
-                $grade = $_POST['gpa_letter'];
-                $sql = oci_parse($conn, "select * from grade where grade = '$grade' and s_id = $sid ");
-                oci_execute($sql);
-                while ($r = oci_fetch_array($sql)) {
-                    $g_code = $r["G_CODE"];
-                }
-                if (isset($_POST['gpa'])) {
-                    $gpa = $_POST['gpa'];
-                    $sql = oci_parse($conn, "select * from GPA where g_code = $g_code and s_id = $sid ");
-                    oci_execute($sql);
-                    if (oci_fetch_all($sql, $a) == 0) {
-                        $sql = oci_parse($conn, "INSERT INTO GPA (G_CODE,GPA) VALUES ($g_code,$gpa)");
-                        if (oci_execute($sql)) {
-        ?><div style="font-size:15px;
-                            color: green;
-                            position: relative;
-                             display:flex;
-                            animation:button .3s linear;text-align: center;">
-                                <?php echo "GPA SCORE SET SUCCESSFULYY FOR GRADE ";
-                                header("refresh:2;"); ?>
-                            </div> <?php
-                                } else {
-                                    ?><div style="font-size:15px;
-                            color: red;
-                            position: relative;
-                             display:flex;
-                            animation:button .3s linear;text-align: center;">
-                                <?php echo "ERROR SETTING GPA SCORE FOR GRADE ";
-                                    header("refresh:2;"); ?>
-                            </div> <?php
-                                }
-                            } else {
-                                    ?><div style="font-size:15px;
-                        color: red;
-                        position: relative;
-                         display:flex;
-                        animation:button .3s linear;text-align: center;">
-                            <?php echo "GPA SCORE FOR THIS GRADE HAS BEEN SET ALREADY";
-                                header("refresh:2;"); ?>
-                        </div> <?php
-                            }
-                        } else {
-                                ?><div style="font-size:15px;
-                        color: red;
-                        position: relative;
-                         display:flex;
-                        animation:button .3s linear;text-align: center;">
-                        <?php echo "ENTER GPA EQUIVALENT";
-                            header("refresh:2;"); ?>
-                    </div> <?php
-                        }
-                    } else {
-                            ?><div style="font-size:15px;
-                    color: red;
-                    position: relative;
-                     display:flex;
-                    animation:button .3s linear;text-align: center;">
-                    <?php echo "SELECT LETTER GRADE";
-                        header("refresh:2;"); ?>
-                </div> <?php
-                    }
-                }
-                        ?>
-        <Label style="font-size: 18px; font-family: sans-serif;
-    font-weight: bold; color: #909290;">Edit Grade Point Average</Label>
-        <div class="input-field" style="margin-right: 10px;">
-            <label>Grade</label>
-            <select required name="edit_gpa_letter">
-                <option disabled selected>Select Letter Grade</option>
-                <?php
-                $get_hos = "select * from grade a join grade_setting b on (a.g_code = b.g_code) where  b.s_id = $sid order by grade";
-                $get = oci_parse(oci_connect($username, $password, $connection), $get_hos);
-                oci_execute($get);
-                while ($row = oci_fetch_array($get)) {
-                ?><option>
-                        <?php echo $row["GRADE"]; ?>
-                    </option> <?php
-                            }
-                                ?>
-            </select>
-            <label>Grade Point Average Equivalent</label>
-            <input type="number" placeholder="Enter Grade Point Average Equivalent" title="Only Numbers" name="edit_gpa_equ" style="width:310px;" pattern="[0-9.]+" step="any">
-            <div style="display: flex;">
-                <button style=" display: inline-block;
-  padding: 6px 12px;
-  background-color: #909290;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  margin-top:10px;
-  margin-bottom:10px;
-  text-decoration: none;" name="edit_gpa" type="submit">
-                    EDIT GPA
-                    <i class="uil uil-edit"></i>
-                </button>
-            </div>
-        </div>
-        <?php
-        if (isset($_POST["edit_gpa"])) {
-            if (isset($_POST["edit_gpa_letter"])) {
-
-                $grade = $_POST['edit_gpa_letter'];
-                $sql = oci_parse($conn, "select * from grade where grade = '$grade' and s_id = $sid ");
-                oci_execute($sql);
-                while ($r = oci_fetch_array($sql)) {
-                    $g_code = $r["G_CODE"];
-                }
-                $gpa = $_POST["edit_gpa_equ"];
-                if ($gpa != '') {
-                    $sql = oci_parse($conn, "update gpa set gpa = $gpa where g_code = $g_code  ");
-                    if (oci_execute($sql)) {
-        ?><div style="font-size:15px;
-                    color: green;
-                    position: relative;
-                     display:flex;
-                    animation:button .3s linear;text-align: center;">
-                            <?php echo "GRADE POINT EQUIVALENT UPDATED SUCCESSFULLY";
-                            header("refresh:2;"); ?>
-                        </div> <?php
-                            } else {
-                                ?><div style="font-size:15px;
-                    color: red;
-                    position: relative;
-                     display:flex;
-                    animation:button .3s linear;text-align: center;">
-                            <?php echo "ERROR UPDATING GRADE POINT EQUIVALENT";
-                                header("refresh:2;"); ?>
-                        </div> <?php
-                            }
-                        } else {
-                                ?><div style="font-size:15px;
-                    color: red;
-                    position: relative;
-                     display:flex;
-                    animation:button .3s linear;text-align: center;">
-                        <?php echo "ENTER GRADE POINT EQUIVALENT";
-                            header("refresh:2;"); ?>
-                    </div> <?php
-                        }
-                    } else {
-                            ?><div style="font-size:15px;
-                color: red;
-                position: relative;
-                 display:flex;
-                animation:button .3s linear;text-align: center;">
-                    <?php echo "SELECT LETTER GRADE";
-                        header("refresh:2;"); ?>
-                </div> <?php
-                    }
-                }
-                        ?>
-        <Label style="font-size: 18px; font-family: sans-serif;
-    font-weight: bold; color: #909290;">Set Subject Credit Hours</Label>
-        <div class="input-field" style="margin-right: 10px;">
-            <label>Subject</label>
-            <select required name="subject_crdt">
-                <option disabled selected>Select Subject</option>
-                <?php
-                $get_hos = "select DISTINCT(SUBJECT) from waec_subject WHERE EXAM = 'WASSCE' ORDER BY SUBJECT";
-                $get = oci_parse(oci_connect($username, $password, $connection), $get_hos);
-                oci_execute($get);
-                while ($row = oci_fetch_array($get)) {
-                ?><option>
-                        <?php echo $row["SUBJECT"]; ?>
-                    </option> <?php
-                            }
-                                ?>
-            </select>
-            <label>Credit Hours</label>
-            <input type="number" placeholder="Enter Credit Hours" title="Only Numbers" name="hours" style="width:310px;" pattern="[0-9]+" step="any">
-            <div style="display: flex;">
-                <button style=" display: inline-block;
-  padding: 6px 12px;
-  background-color: #909290;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  margin-top:10px;
-  margin-bottom:10px;
-  text-decoration: none;" name="set_credit" type="submit">
-                    SET CREDIT HOURS
-                    <i class="uil uil-edit"></i>
-                </button>
-            </div>
-        </div>
         <?php
         if (isset($_POST['set_credit'])) {
             if (isset($_POST['subject_crdt'])) {
@@ -812,40 +525,7 @@ include('auto_logout.php');
                     }
                 }
                         ?>
-        <Label style="font-size: 18px; font-family: sans-serif;
-    font-weight: bold; color: #909290;">Edit Subject Credit Hours</Label>
-        <div class="input-field" style="margin-right: 10px;">
-            <label>Subject</label>
-            <select required name="edit_subject_crdt">
-                <option disabled selected>Select Subject</option>
-                <?php
-                $get_hos = "select DISTINCT(a.SUBJECT) from waec_subject a join SUBJECT_CREDIT_HRS b on (a.sub_code=b.sub_code) where b.s_id = $sid ";
-                $get = oci_parse(oci_connect($username, $password, $connection), $get_hos);
-                oci_execute($get);
-                while ($row = oci_fetch_array($get)) {
-                ?><option>
-                        <?php echo $row["SUBJECT"]; ?>
-                    </option> <?php
-                            }
-                                ?>
-            </select>
-            <label>Credit Hours</label>
-            <input type="number" placeholder="Enter Credit Hours" title="Only Numbers" name="edit_hours" style="width:310px;" pattern="[0-9]+" step="any">
-            <div style="display: flex;">
-                <button style=" display: inline-block;
-  padding: 6px 12px;
-  background-color: #909290;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  margin-top:10px;
-  margin-bottom:10px;
-  text-decoration: none;" name="edit_credit" type="submit">
-                    EDIT CREDIT HOURS
-                    <i class="uil uil-hourglass"></i>
-                </button>
-            </div>
-        </div>
+      
         <?php
         if (isset($_POST["edit_credit"])) {
             if (isset($_POST["edit_subject_crdt"])) {

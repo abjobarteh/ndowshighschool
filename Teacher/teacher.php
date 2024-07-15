@@ -80,6 +80,9 @@ $sid = $_SESSION['sid'];
                             <a href="class_roster.php">View Class Rosters</a>
                         </li>
                         <li class="item">
+                            <a href="compile_gpa.php">Compile Marks</a>
+                        </li>
+                        <li class="item">
                             <a href="promotion.php">Promotion</a>
                         </li>
                     </ul>

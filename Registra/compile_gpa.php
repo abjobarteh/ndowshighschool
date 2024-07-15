@@ -173,10 +173,17 @@ include('auto_logout.php');
                             $gpa = $row["GPA"];
                             //  echo $gpa;
                         }
-                        $sql = oci_parse($conn, "INSERT INTO STUDENT_STANDINGS (S_ID,GPA,CLASS_CODE,ACADEMIC_YEAR,TERM,STUD_ID,STATUS) VALUES ($sid,$gpa,$s_code,'$a_y','$t','$stud_id','COMPILED')
+                        $SQL = oci_parse($conn, "SELECT ROUND(AVG(MARK),1) AS AVERAGE FROM STUDENT_CUMULATIVE WHERE STUD_ID = '$stud_id' AND TERM = '$t' AND SUB_CODE = $s_code");
+                        oci_execute($SQL);
+                        while ($row = oci_fetch_array($SQL)) {
+                            $avg = $row["AVERAGE"];
+                            //  echo $gpa;
+                        }
+                        $sql = oci_parse($conn, "INSERT INTO STUDENT_STANDINGS (S_ID,GPA,CLASS_CODE,ACADEMIC_YEAR,TERM,STUD_ID,STATUS,AVERAGE) VALUES ($sid,$gpa,$s_code,'$a_y','$t','$stud_id','COMPILED','$avg')
                         ");
                         //     echo "INSERT INTO STDUENT_STANDINGS (S_ID,GPA,CLASS_CODE,ACADEMIC_YEAR,TERM,STUD_ID) VALUES ($sid,$gpa,$s_code,'$a_y','$t','$stud_id')";
                         oci_execute($sql);
+                        //     echo "INSERT INTO STDUENT_STANDINGS (S_ID,GPA,CLASS_CODE,ACADEMIC_YEAR,TERM,STUD_ID) VALUES ($sid,$gpa,$s_code,'$a_y','$t','$stud_id')"
                     }
             ?><div style="font-size:15px;
                     color: green;

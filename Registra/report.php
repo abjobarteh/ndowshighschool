@@ -248,7 +248,7 @@ include('auto_logout.php');
                                 //            $pdf->Image($logoPath, 170, 15, 30, 35);
                                 $pdf->SetTextColor(29, 91, 121);
                                 $pdf->SetXY(60, 10);
-                                $pdf->SetFont('helvetica', 'B', 18);
+                                $pdf->SetFont('helvetica', 'B', 15);
                                 $pdf->Cell(0, 5, $school, 0, 1);
                                 $companyInfo = "$address\n$district\nREGION\nThe Gambia\n$email\nTel: $phone_one/ $phone_two";
                                 $pdf->SetFont('dejavusans', 'B', 8); // Adjust font size for school information
@@ -262,19 +262,9 @@ include('auto_logout.php');
                                 $pdf->SetX(170);
                                 $pdf->SetFont('times', '', 8); // Adjust the font size as needed
 
-                                $pdf->Cell(0, 5, $a_y, 0, 1, 'R'); // Replace $academicYear with the actual variable holding the value
+                                $pdf->Cell(0, 5, $t, 0, 1, 'R'); // Replace $academicYear with the actual variable holding the value
 
                                 $pdf->SetX(170);
-                                if (strpos($t, 'FIRST') !== false) {
-                                    $x = "FIRST TERM";
-                                    $pdf->Cell(0, 5, $x, 0, 1, 'R');
-                                } else if (strpos($x, 'SECOND') !== false) {
-                                    $t = "SECOND TERM";
-                                    $pdf->Cell(0, 5, $x, 0, 1, 'R');
-                                } else if (strpos($x, 'THIRD') !== false) {
-                                    $t = "THIRD TERM";
-                                    $pdf->Cell(0, 5, $x, 0, 1, 'R');
-                                }
 
                                 $sql = "SELECT * FROM STUDENT A JOIN CLASS_STUDENT B ON (A.STUD_ID=B.STUD_ID) JOIN STUDENT_PERSONAL C ON (A.STUD_ID = C.STUD_ID) JOIN SUB_CLASS D ON (B.SUB_CODE=D.SUB_CODE) JOIN PROG_CLASS E ON (D.SUB_CODE=E.SUB_CODE) JOIN PROGRAMME F ON (E.PROG_ID=F.PROG_ID) WHERE A.S_ID = $sid AND B.SUB_CODE = $sub_code and a.stud_id = trim('$st')  AND A.STATUS != 'GRADUATED' ORDER BY A.NAME";
 
@@ -319,7 +309,7 @@ include('auto_logout.php');
 
 
 
-                                    $s = "SELECT DISTINCT(C.STUD_ID),A.SUBJECT,ROUND(c.CONST_ASS,0) AS CA,ROUND(c.EXAM,0) AS EXAM , ROUND(D.MARK,0) AS TOTAL,F.GRADE,D.CREDIT_HRS,D.GPA FROM WAEC_SUBJECT A JOIN STUDENT_SUBJECT B ON (A.SUB_CODE=B.SUB_CODE) JOIN STUDENT_EVALUATION C ON (B.SUB_CODE=C.SUB_CODE) JOIN STUDENT_CUMULATIVE D ON (A.SUB_CODE=D.SUBJ_CODE) JOIN STUDENT E ON (D.STUD_ID=E.STUD_ID) JOIN GRADE F ON (D.G_CODE=F.G_CODE)  WHERE C.STUD_ID = trim('$st') AND D.STUD_ID = trim('$st') and b.stud_id= trim('$st')  AND D.ACADEMIC_YEAR ='$a_y' and C.term = '$t'  AND C.ACADEMIC_YEAR ='$a_y' and D.term = '$t' AND C.MARK_STATUS ='ACCEPTED' AND C.CLASS_CODE=$sub_code AND D.SUB_CODE = $sub_code ORDER BY A.SUBJECT ";
+                                    $s = "SELECT DISTINCT(C.STUD_ID),A.SUBJECT,ROUND(c.CONST_ASS,0) AS CA,ROUND(c.EXAM,0) AS EXAM , ROUND(D.MARK,0) AS TOTAL,F.GRADE,F.GRADE,F.INTERPRETATION FROM WAEC_SUBJECT A JOIN STUDENT_SUBJECT B ON (A.SUB_CODE=B.SUB_CODE) JOIN STUDENT_EVALUATION C ON (B.SUB_CODE=C.SUB_CODE) JOIN STUDENT_CUMULATIVE D ON (A.SUB_CODE=D.SUBJ_CODE) JOIN STUDENT E ON (D.STUD_ID=E.STUD_ID) JOIN GRADE F ON (D.G_CODE=F.G_CODE)  WHERE C.STUD_ID = trim('$st') AND D.STUD_ID = trim('$st') and b.stud_id= trim('$st')  AND D.ACADEMIC_YEAR ='$a_y' and C.term = '$t'  AND C.ACADEMIC_YEAR ='$a_y' and D.term = '$t' AND C.MARK_STATUS ='ACCEPTED' AND C.CLASS_CODE=$sub_code AND D.SUB_CODE = $sub_code ORDER BY A.SUBJECT ";
 
                                     //   echo  $s;
                                     $stmts = oci_parse($conn, $s);
@@ -334,9 +324,7 @@ include('auto_logout.php');
                                     $pdf->Cell(20, 8, 'CASS (30%)', 1, 0, 'C');
                                     $pdf->Cell(25, 8, 'Exam (70%) ', 1, 0, 'C');
                                     $pdf->Cell(25, 8, 'Total', 1, 0, 'C');
-                                    $pdf->Cell(20, 8, 'Credit Hours', 1, 0, 'C');
-                                    $pdf->Cell(15, 8, 'GPA', 1, 0, 'C');
-                                    $pdf->Cell(15, 8, 'Grade', 1, 0, 'C');
+                                    $pdf->Cell(20, 8, 'Grade', 1, 0, 'C');
                                     $pdf->Cell(25, 8, 'Remark', 1, 0, 'C'); // Move to the next line after the last cell
                                     //  $pdf->Cell(25, 8, 'Remark', 1, 0, 'C');
                                     // Table content with borders
@@ -351,87 +339,14 @@ include('auto_logout.php');
                                         $e = $row['EXAM'];
                                         $tt = $row['TOTAL'];
                                         $g = $row['GRADE'];
-                                        $gpas = $row['GPA'];
-                                        $hrs = $row['CREDIT_HRS'];
+                                        $rm = $row['INTERPRETATION'];
 
-                                        if ($g == 'FAIL') {
-                                            $pdf->SetTextColor(255, 0, 0);
-                                            $pdf->Cell(50, 8, $subj, 1, 0, 'C');
-                                            $pdf->Cell(20, 8, $ca, 1, 0, 'C');
-                                            $pdf->Cell(25, 8, $e, 1, 0, 'C');
-                                            $pdf->Cell(25, 8, $tt, 1, 0, 'C');
-
-                                            $pdf->Cell(20, 8, $hrs, 1, 0, 'C');
-
-                                            if (strlen($gpas) == 1) {
-                                                $pdf->Cell(15, 8, $gpas . ".0", 1, 0, 'C');
-                                            } else {
-                                                $pdf->Cell(15, 8, $gpas, 1, 0, 'C');
-                                            }
-
-                                            $pdf->Cell(15, 8, $g, 1, 0, 'C');
-                                            if ($gpas == 0.0) {
-                                                $Comments = "FAIL";
-                                                $pdf->SetTextColor(255, 0, 0);
-                                                $pdf->Cell(25, 8, $Comments, 1, 0, 'C');
-                                            } else if ($gpas >= 1.7 && $gpas <= 2.2) {
-                                                $Comments = "PASS";
-                                                //    $pdf->SetTextColor(29, 91, 121);
-                                                $pdf->Cell(25, 8, $Comments, 1, 0, 'C');
-                                            } else if ($gpas >= 2.3 && $gpas <= 3.0) {
-                                                $Comments = "CREDIT";
-                                                //    $pdf->SetTextColor(29, 91, 121);
-                                                $pdf->Cell(25, 8, $Comments, 1, 0, 'C');
-                                            } else if ($gpas >= 3.1 && $gpas <= 3.3) {
-                                                $Comments = "GOOD";
-                                                //    $pdf->SetTextColor(29, 91, 121);
-                                                $pdf->Cell(25, 8, $Comments, 1, 0, 'C');
-                                            } else if ($gpas >= 3.4 && $gpas <= 3.7) {
-                                                $Comments = "VERY GOOD";
-                                                //   $pdf->SetTextColor(29, 91, 121);
-                                                $pdf->Cell(25, 8, $Comments, 1, 0, 'C');
-                                            } else if ($gpas >= 3.8 && $gpas <= 4.3) {
-                                                $Comments = "EXCELLENT";
-                                                //   $pdf->SetTextColor(29, 91, 121);
-                                                $pdf->Cell(25, 8, $Comments, 1, 0, 'C');
-                                            }
-                                        } else {
-                                            $pdf->SetTextColor(29, 91, 121);
-                                            $pdf->Cell(50, 8, $subj, 1, 0, 'C');
-                                            $pdf->Cell(20, 8, $ca, 1, 0, 'C');
-                                            $pdf->Cell(25, 8, $e, 1, 0, 'C');
-                                            $pdf->Cell(25, 8, $tt, 1, 0, 'C');
-
-                                            $pdf->Cell(20, 8, $hrs, 1, 0, 'C');
-
-                                            if (strlen($gpas) == 1) {
-                                                $pdf->Cell(15, 8, $gpas . ".0", 1, 0, 'C');
-                                            } else {
-                                                $pdf->Cell(15, 8, $gpas, 1, 0, 'C');
-                                            }
-
-                                            $pdf->Cell(15, 8, $g, 1, 0, 'C');
-                                            if ($gpas == 0) {
-                                                $Comments = "FAIL";
-                                                $pdf->SetTextColor(255, 0, 0);
-                                                $pdf->Cell(25, 8, $Comments, 1, 0, 'C');
-                                            } else if ($gpas == 1.7 || $gpas == 2.0) {
-                                                $Comments = "PASS";
-                                                $pdf->Cell(25, 8, $Comments, 1, 0, 'C');
-                                            } else if ($gpas == 2.3 || $gpas == 2.7 || $gpas == 3.0) {
-                                                $Comments = "CREDIT";
-                                                $pdf->Cell(25, 8, $Comments, 1, 0, 'C');
-                                            } else if ($gpas == 3.3) {
-                                                $Comments = "GOOD";
-                                                $pdf->Cell(25, 8, $Comments, 1, 0, 'C');
-                                            } else if ($gpas == 3.7) {
-                                                $Comments = "VERY GOOD";
-                                                $pdf->Cell(25, 8, $Comments, 1, 0, 'C');
-                                            } else if ($gpas == 4.0 || $gpas == 4.3) {
-                                                $Comments = "EXCELLENT";
-                                                $pdf->Cell(25, 8, $Comments, 1, 0, 'C');
-                                            }
-                                        }
+                                        $pdf->Cell(50, 8, $subj, 1, 0, 'C');
+                                        $pdf->Cell(20, 8, $ca, 1, 0, 'C');
+                                        $pdf->Cell(25, 8, $e, 1, 0, 'C');
+                                        $pdf->Cell(25, 8, $tt, 1, 0, 'C');
+                                        $pdf->Cell(20, 8, $g, 1, 0, 'C');
+                                        $pdf->Cell(25, 8, $rm, 1, 0, 'C');
                                         $pdf->SetTextColor(29, 91, 121);
 
                                         $pdf->Ln();
@@ -444,13 +359,13 @@ include('auto_logout.php');
                                             $avg_cass = $row['AVG_CASS'];
                                             $avg_exam = $row['AVG_EXAM'];
                                         }
-                                        $set = "select ROUND(SUM(CREDIT_HRS),2) AS TOTAL_HRS,ROUND(SUM(MARK),2) AS TOTAL_TOTAL,ROUND(AVG(GPA),2) AS AVG_GPA,ROUND(AVG(MARK),2) AS AVG_MARK FROM STUDENT_CUMULATIVE WHERE stud_id = trim('$st') and academic_year = '$a_y' and term = '$t' and sub_code = $sub_code";
+                                        $set = "select ROUND(SUM(MARK),2) AS TOTAL_TOTAL,ROUND(AVG(MARK),2) AS AVG_MARK FROM STUDENT_CUMULATIVE WHERE stud_id = trim('$st') and academic_year = '$a_y' and term = '$t' and sub_code = $sub_code";
                                         $sql = oci_parse($conn, $set);
                                         oci_execute($sql);
                                         while ($row = oci_fetch_array($sql)) {
-                                            $totalhrs = $row['TOTAL_HRS'];
+                                        
                                             $total_total = $row['TOTAL_TOTAL'];
-                                            $avg_gpa = $row['AVG_GPA'];
+                                          
                                             $avg_total = $row['AVG_MARK'];
                                         }
 
@@ -469,40 +384,38 @@ include('auto_logout.php');
                                     $pdf->Cell(50, 8, 'Total', 1, 0, 'C');
                                     $pdf->Cell(20, 8, $total_cass, 1, 0, 'C');
                                     $pdf->Cell(25, 8, $total_exam, 1, 0, 'C');
-                                    $pdf->Cell(25, 8, $total_total, 1, 0, 'C');
-                                    $pdf->Cell(20, 8, $totalhrs, 1, 0, 'C');
-                                    $pdf->Cell(15, 8, ' ', 1, 0, 'C');
-                                    $pdf->Cell(15, 8, ' ', 1, 0, 'C');
                                     $pdf->Cell(25, 8, ' ', 1, 0, 'C');
+                                    $pdf->Cell(20, 8, ' ', 1, 0, 'C');
+                                    $pdf->Cell(25, 8, ' ', 1, 0, 'C');
+                                   
                                     $pdf->Ln();
                                     $pdf->Cell(50, 8, 'Mean Score', 1, 0, 'C');
                                     $pdf->Cell(20, 8, $avg_cass, 1, 0, 'C');
                                     $pdf->Cell(25, 8, $avg_exam, 1, 0, 'C');
                                     $pdf->Cell(25, 8, $avg_total, 1, 0, 'C');
                                     $pdf->Cell(20, 8, ' ', 1, 0, 'C');
-                                    $pdf->Cell(15, 8, $avg_gpa / 1.00, 1, 0, 'C');
-                                    $pdf->Cell(15, 8, ' ', 1, 0, 'C');
                                     $pdf->Cell(25, 8, ' ', 1, 0, 'C');
-                                    $sql = "SELECT B.GPA,ROWNUM AS POS FROM STUDENT A JOIN STUDENT_STANDINGS B ON (A.STUD_ID=B.STUD_ID) WHERE A.STUD_ID = trim('$st') AND B.ACADEMIC_YEAR ='$a_y' and B.term = '$t' AND B.CLASS_CODE = $sub_code ORDER BY B.GPA";
+                                  
+                                    $sql = "SELECT B.AVERAGE,ROWNUM AS POS FROM STUDENT A JOIN STUDENT_STANDINGS B ON (A.STUD_ID=B.STUD_ID) WHERE A.STUD_ID = trim('$st') AND B.ACADEMIC_YEAR ='$a_y' and B.term = '$t' AND B.CLASS_CODE = $sub_code ORDER BY B.AVERAGE";
                                     //     echo $sql;
                                     $stmt = oci_parse($conn, $sql);
                                     oci_execute($stmt);
                                     while ($row = oci_fetch_array($stmt)) {
-                                        $gpa = $row['GPA'];
+                                        $gpa = $row['AVERAGE'];
                                         //   $pos = $row['POS'];
                                     }
 
-                                    $sql = "SELECT B.GPA, COUNT(B.GPA) AS TOTALSTU FROM STUDENT A JOIN STUDENT_STANDINGS B ON (A.STUD_ID=B.STUD_ID) WHERE A.STUD_ID = trim('$st') AND B.ACADEMIC_YEAR ='$a_y' and B.term = '$t' AND B.class_code = $sub_code GROUP BY B.GPA, a.STUD_ID,b.class_code,b.academic_year,b.term
-                                    ORDER BY B.GPA ";
+                                    $sql = "SELECT B.AVERAGE, COUNT(B.AVERAGE) AS TOTALSTU FROM STUDENT A JOIN STUDENT_STANDINGS B ON (A.STUD_ID=B.STUD_ID) WHERE A.STUD_ID = trim('$st') AND B.ACADEMIC_YEAR ='$a_y' and B.term = '$t' AND B.class_code = $sub_code  GROUP BY B.AVERAGE 
+                                    ORDER BY B.AVERAGE";
                                     //   echo $sql;
                                     $stmt = oci_parse($conn, $sql);
                                     oci_execute($stmt);
                                     while ($row = oci_fetch_array($stmt)) {
 
-                                        $gpa = $row['GPA'];
+                                        $gpa = $row['AVERAGE'];
                                     }
 
-                                    $sql = "SELECT COUNT(B.GPA) AS TOTALSTU FROM STUDENT A JOIN STUDENT_STANDINGS B ON (A.STUD_ID=B.STUD_ID) WHERE  B.ACADEMIC_YEAR ='$a_y' and B.term = '$t' AND B.class_code = $sub_code  ";
+                                    $sql = "SELECT COUNT(B.AVERAGE) AS TOTALSTU FROM STUDENT A JOIN STUDENT_STANDINGS B ON (A.STUD_ID=B.STUD_ID) WHERE  B.ACADEMIC_YEAR ='$a_y' and B.term = '$t' AND B.class_code = $sub_code  GROUP BY B.AVERAGE   ";
                                     //   echo $sql;
                                     $stmt = oci_parse($conn, $sql);
                                     oci_execute($stmt);
@@ -519,8 +432,8 @@ include('auto_logout.php');
                                         FROM
                                             student_standings
                                         WHERE
-                                            academic_year = '2023/2024 ACADEMIC YEAR'
-                                            AND Term = '2023/2024 ACADEMIC YEAR FIRST TERM' AND CLASS_CODE = $subcode ORDER BY GPA
+                                            academic_year = '$a_y'
+                                            AND Term = '$t' AND CLASS_CODE = $subcode ORDER BY GPA
                                     )
                                     SELECT
                                         ClassPosition
@@ -534,15 +447,14 @@ include('auto_logout.php');
                                     while ($rw = oci_fetch_array($stmt)) {
                                         $posi =  $rw["CLASSPOSITION"];
                                     }
-                          
 
-                                    $getcpa = "SELECT ROUND(AVG(GPA),2) AS CGPA  FROM STUDENT A JOIN STUDENT_STANDINGS B ON (A.STUD_ID=B.STUD_ID) WHERE A.STUD_ID = '$st'";
-                                    $sql = oci_parse($conn,$getcpa);
+
+                                    $getcpa = "SELECT ROUND(AVG(AVERAGE),2) AS CGPA  FROM STUDENT A JOIN STUDENT_STANDINGS B ON (A.STUD_ID=B.STUD_ID) WHERE A.STUD_ID = '$st'";
+                                    $sql = oci_parse($conn, $getcpa);
                                     oci_execute($sql);
-                                    while($r=oci_fetch_array($sql)){
-                                        $cgpa = $r['CGPA']/1.00;
+                                    while ($r = oci_fetch_array($sql)) {
+                                        $cgpa = $r['CGPA'] / 1.00;
                                     }
-                         
                                 }
                                 $pdf->SetY($pdf->GetY() + 5);
                                 $pdf->SetFont('dejavusans', 'B', 8);
@@ -553,156 +465,40 @@ include('auto_logout.php');
                                 $stmt = oci_parse($conn, $sql);
                                 oci_execute($stmt);
                                 $cnt = oci_fetch_all($stmt, $a);
-                              
-                                if ($cnt < 8) {
+
+                               if ($cnt < 8) {
                                     $pdf->Ln();
                                     $principalComments = "Class Teacher Comments:....INCOMPLETE..MARKS...........";
-                                } else {
-                                    if ($gpa >= 0.0 && $gpa <= 1.69) {
-                                        $sql = "SELECT B.GPA,COUNT(B.GPA) AS COUNT FROM STUDENT A JOIN STUDENT_STANDINGS B ON (A.STUD_ID=B.STUD_ID) WHERE A.STUD_ID = '$st' and B.term = '$t'  GROUP BY B.GPA ORDER BY B.GPA";
-                                        //      echo $sql;
+                                } else  {
+                                   
+                                        $sql = "SELECT B.AVERAGE,COUNT(B.AVERAGE) AS COUNT FROM STUDENT A JOIN STUDENT_STANDINGS B ON (A.STUD_ID=B.STUD_ID) WHERE A.STUD_ID = '$st' and B.term = '$t'  GROUP BY B.AVERAGE ORDER BY B.AVERAGE";
+                                          echo $sql;
                                         $stmt = oci_parse($conn, $sql);
                                         oci_execute($stmt);
                                         $pdf->Ln();
                                         while ($row = oci_fetch_array($stmt)) {
                                             $rowcount = $row['COUNT'];
-                                            $gpa = $row['GPA'] / 1.00;
-                                          //  $cgpa = $gpa / $rowcount;
+                                            $gpa = $row['AVERAGE'] / 1.00;
+                                            $getin = oci_parse($conn,"SELECT * FROM GRADE A JOIN GRADE_SETTING B ON (A.G_CODE=B.G_CODE)  WHERE B.START_GRADE_RANGE <= CAST($gpa AS INT) AND CAST($gpa AS INT) <= B.END_GRADE_RANGE  ");
+                                            oci_execute($getin);
+                                            while($r=oci_fetch_array($getin)){
+                                                $int= $r['INTERPRETATION'];
+                                            }
+                                            //  $cgpa = $gpa / $rowcount;
                                             $pdf->SetY($pdf->GetY() + 5);
-    
+
                                             $pdf->SetFont('times', 'B', 9);
                                             $pdf->SetX(130);
                                             $pdf->Cell(40, 10, 'CLASS POSITION: ', 0, 0, 'C');
                                             $pdf->Cell(30, 10, $posi . " OUT OF " . $totalstu, 0, 1, 'C'); // Adjust font size for GPA
                                             $pdf->SetX(130);
                                             $pdf->Cell(40, 10, 'GPA:', 0, 0, 'C');
-                                            $pdf->Cell(30, 10, $gpa . "/4.30", 0, 1, 'C');
+                                            $pdf->Cell(30, 10, $gpa . "/100", 0, 1, 'C');
                                             $pdf->SetX(130);
                                             $pdf->Cell(40, 10, 'CGPA:', 0, 0, 'C');
-                                            $pdf->Cell(30, 10, $cgpa . "/4.30", 0, 1, 'C');
+                                            $pdf->Cell(30, 10, $cgpa . "/100", 0, 1, 'C');
+                                            $principalComments = "Class Teacher Comments:....$int...........";
                                         }
-                                        $principalComments = "Class Teacher Comments:....FAIL...........";
-                                    } else if ($gpa >= 1.7 && $gpa <= 2.49) {
-                                        $sql = "SELECT B.GPA,COUNT(B.GPA) AS COUNT FROM STUDENT A JOIN STUDENT_STANDINGS B ON (A.STUD_ID=B.STUD_ID) WHERE A.STUD_ID = '$st' and B.term = '$t'  GROUP BY B.GPA ORDER BY B.GPA";
-                                        //      echo $sql;
-                                        $stmt = oci_parse($conn, $sql);
-                                        oci_execute($stmt);
-                                        $pdf->Ln();
-                                        while ($row = oci_fetch_array($stmt)) {
-                                            $rowcount = $row['COUNT'];
-                                            $gpa = $row['GPA'] / 1.00;
-                                          //  $cgpa = $gpa / $rowcount;
-                                            $pdf->SetY($pdf->GetY() + 5);
-    
-                                            $pdf->SetFont('times', 'B', 9);
-                                            $pdf->SetX(130);
-                                            $pdf->Cell(40, 10, 'CLASS POSITION: ', 0, 0, 'C');
-                                            $pdf->Cell(30, 10, $posi . " OUT OF " . $totalstu, 0, 1, 'C'); // Adjust font size for GPA
-                                            $pdf->SetX(130);
-                                            $pdf->Cell(40, 10, 'GPA:', 0, 0, 'C');
-                                            $pdf->Cell(30, 10, $gpa . "/4.30", 0, 1, 'C');
-                                            $pdf->SetX(130);
-                                            $pdf->Cell(40, 10, 'CGPA:', 0, 0, 'C');
-                                            $pdf->Cell(30, 10, $cgpa . "/4.30", 0, 1, 'C');
-                                        }
-                                        $principalComments = "Class Teacher Comments:....PASS...........";
-                                    } else if ($gpa >= 2.5 && $gpa <= 2.99) {
-                                        $sql = "SELECT B.GPA,COUNT(B.GPA) AS COUNT FROM STUDENT A JOIN STUDENT_STANDINGS B ON (A.STUD_ID=B.STUD_ID) WHERE A.STUD_ID = '$st' and B.term = '$t'  GROUP BY B.GPA ORDER BY B.GPA";
-                                        //      echo $sql;
-                                        $stmt = oci_parse($conn, $sql);
-                                        oci_execute($stmt);
-                                        $pdf->Ln();
-                                        while ($row = oci_fetch_array($stmt)) {
-                                            $rowcount = $row['COUNT'];
-                                            $gpa = $row['GPA'] / 1.00;
-                                          //  $cgpa = $gpa / $rowcount;
-                                            $pdf->SetY($pdf->GetY() + 5);
-    
-                                            $pdf->SetFont('times', 'B', 9);
-                                            $pdf->SetX(130);
-                                            $pdf->Cell(40, 10, 'CLASS POSITION: ', 0, 0, 'C');
-                                            $pdf->Cell(30, 10, $posi . " OUT OF " . $totalstu, 0, 1, 'C'); // Adjust font size for GPA
-                                            $pdf->SetX(130);
-                                            $pdf->Cell(40, 10, 'GPA:', 0, 0, 'C');
-                                            $pdf->Cell(30, 10, $gpa . "/4.30", 0, 1, 'C');
-                                            $pdf->SetX(130);
-                                            $pdf->Cell(40, 10, 'CGPA:', 0, 0, 'C');
-                                            $pdf->Cell(30, 10, $cgpa . "/4.30", 0, 1, 'C');
-                                        }
-                                        $principalComments = "Class Teacher Comments:....CREDIT...........";
-                                    } else if ($gpa >= 3.0 && $gpa <= 3.49) {
-                                        $sql = "SELECT B.GPA,COUNT(B.GPA) AS COUNT FROM STUDENT A JOIN STUDENT_STANDINGS B ON (A.STUD_ID=B.STUD_ID) WHERE A.STUD_ID = '$st' and B.term = '$t'  GROUP BY B.GPA ORDER BY B.GPA";
-                                        //      echo $sql;
-                                        $stmt = oci_parse($conn, $sql);
-                                        oci_execute($stmt);
-                                        $pdf->Ln();
-                                        while ($row = oci_fetch_array($stmt)) {
-                                            $rowcount = $row['COUNT'];
-                                            $gpa = $row['GPA'] / 1.00;
-                                          //  $cgpa = $gpa / $rowcount;
-                                            $pdf->SetY($pdf->GetY() + 5);
-    
-                                            $pdf->SetFont('times', 'B', 9);
-                                            $pdf->SetX(130);
-                                            $pdf->Cell(40, 10, 'CLASS POSITION: ', 0, 0, 'C');
-                                            $pdf->Cell(30, 10, $posi . " OUT OF " . $totalstu, 0, 1, 'C'); // Adjust font size for GPA
-                                            $pdf->SetX(130);
-                                            $pdf->Cell(40, 10, 'GPA:', 0, 0, 'C');
-                                            $pdf->Cell(30, 10, $gpa . "/4.30", 0, 1, 'C');
-                                            $pdf->SetX(130);
-                                            $pdf->Cell(40, 10, 'CGPA:', 0, 0, 'C');
-                                            $pdf->Cell(30, 10, $cgpa . "/4.30", 0, 1, 'C');
-                                        }
-                                        $principalComments = "Class Teacher Comments:....GOOD...........";
-                                    } else if ($gpa >= 3.5 && $gpa <= 3.99) {
-                                        $sql = "SELECT B.GPA,COUNT(B.GPA) AS COUNT FROM STUDENT A JOIN STUDENT_STANDINGS B ON (A.STUD_ID=B.STUD_ID) WHERE A.STUD_ID = '$st' and B.term = '$t'  GROUP BY B.GPA ORDER BY B.GPA";
-                                        //      echo $sql;
-                                        $stmt = oci_parse($conn, $sql);
-                                        oci_execute($stmt);
-                                        $pdf->Ln();
-                                        while ($row = oci_fetch_array($stmt)) {
-                                            $rowcount = $row['COUNT'];
-                                            $gpa = $row['GPA'] / 1.00;
-                                          //  $cgpa = $gpa / $rowcount;
-                                            $pdf->SetY($pdf->GetY() + 5);
-    
-                                            $pdf->SetFont('times', 'B', 9);
-                                            $pdf->SetX(130);
-                                            $pdf->Cell(40, 10, 'CLASS POSITION: ', 0, 0, 'C');
-                                            $pdf->Cell(30, 10, $posi . " OUT OF " . $totalstu, 0, 1, 'C'); // Adjust font size for GPA
-                                            $pdf->SetX(130);
-                                            $pdf->Cell(40, 10, 'GPA:', 0, 0, 'C');
-                                            $pdf->Cell(30, 10, $gpa . "/4.30", 0, 1, 'C');
-                                            $pdf->SetX(130);
-                                            $pdf->Cell(40, 10, 'CGPA:', 0, 0, 'C');
-                                            $pdf->Cell(30, 10, $cgpa . "/4.30", 0, 1, 'C');
-                                        }
-                                        $principalComments = "Class Teacher Comments:....VERY...GOOD...........";
-                                    } else if ($gpa >= 4.0 && $gpa <= 4.59) {
-                                        $sql = "SELECT B.GPA,COUNT(B.GPA) AS COUNT FROM STUDENT A JOIN STUDENT_STANDINGS B ON (A.STUD_ID=B.STUD_ID) WHERE A.STUD_ID = '$st' and B.term = '$t'  GROUP BY B.GPA ORDER BY B.GPA";
-                                        //      echo $sql;
-                                        $stmt = oci_parse($conn, $sql);
-                                        oci_execute($stmt);
-                                        $pdf->Ln();
-                                        while ($row = oci_fetch_array($stmt)) {
-                                            $rowcount = $row['COUNT'];
-                                            $gpa = $row['GPA'] / 1.00;
-                                          //  $cgpa = $gpa / $rowcount;
-                                            $pdf->SetY($pdf->GetY() + 5);
-    
-                                            $pdf->SetFont('times', 'B', 9);
-                                            $pdf->SetX(130);
-                                            $pdf->Cell(40, 10, 'CLASS POSITION: ', 0, 0, 'C');
-                                            $pdf->Cell(30, 10, $posi . " OUT OF " . $totalstu, 0, 1, 'C'); // Adjust font size for GPA
-                                            $pdf->SetX(130);
-                                            $pdf->Cell(40, 10, 'GPA:', 0, 0, 'C');
-                                            $pdf->Cell(30, 10, $gpa . "/4.30", 0, 1, 'C');
-                                            $pdf->SetX(130);
-                                            $pdf->Cell(40, 10, 'CGPA:', 0, 0, 'C');
-                                            $pdf->Cell(30, 10, $cgpa . "/4.30", 0, 1, 'C');
-                                        }
-                                        $principalComments = "Class Teacher Comments:....EXCELLENT...........";
-                                    }
                                 }
 
                                 $pdf->SetY($pdf->GetY() - 8);

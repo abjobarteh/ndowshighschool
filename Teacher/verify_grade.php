@@ -234,12 +234,12 @@ include('auto_logout.php');
             if (isset($_POST['enroll']) && !empty($_POST['enroll'])) {
                 $selectedStudentIds = $_POST['enroll'];
                 foreach ($selectedStudentIds as $studentId) {
-                    $sql = oci_parse($conn, "UPDATE STUDENT_EVALUATION SET MARK_STATUS = 'ACCEPTED' WHERE S_ID = $sid AND MARK_STATUS = 'PENDING' and CLASS_CODE = $s_code AND SUB_CODE = $sub_code AND EMP_ID = '$emp_id' AND STUD_ID = '$studentId' ");
+                    $sql = oci_parse($conn, "UPDATE STUDENT_EVALUATION SET MARK_STATUS = 'ACCEPTED' WHERE S_ID = $sid AND MARK_STATUS = 'PENDING' and CLASS_CODE = $s_code AND SUB_CODE = $sub_code AND EMP_ID = '$emp_id' AND STUD_ID = '$studentId' and term = '$t' ");
 
                     if (oci_execute($sql)) {
                         $stud_id = $studentId;
                         // Fetch total marks for the student
-                        $gettotal = "SELECT * FROM STUDENT A JOIN STUDENT_EVALUATION B ON (A.STUD_ID=B.STUD_ID) WHERE B.S_ID = $sid AND MARK_STATUS = 'ACCEPTED' and B.CLASS_CODE = $s_code AND B.SUB_CODE = $sub_code AND B.EMP_ID = '$emp_id' AND B.STUD_ID = '$stud_id'";
+                        $gettotal = "SELECT * FROM STUDENT A JOIN STUDENT_EVALUATION B ON (A.STUD_ID=B.STUD_ID) WHERE B.S_ID = $sid AND MARK_STATUS = 'ACCEPTED' and B.CLASS_CODE = $s_code AND B.SUB_CODE = $sub_code AND B.EMP_ID = '$emp_id' AND B.STUD_ID = '$stud_id' and term = '$t' ";
                         $s = oci_parse($conn, $gettotal);
                         oci_execute($s);
 
@@ -256,25 +256,8 @@ include('auto_logout.php');
                             $grade = $b["GRADE"];
                         }
 
-                        // Fetch GPA based on grade
-                        $getgpa = oci_parse($conn, "SELECT * FROM GPA WHERE g_code = $g_code");
-                        oci_execute($getgpa);
-
-                        while ($c = oci_fetch_array($getgpa)) {
-                            $gpa = $c['GPA'];
-                        }
-
-                        // Fetch subject credit hours
-                        $getgpa = oci_parse($conn, "SELECT * FROM SUBJECT WHERE SUB_CODE = $sub_code AND subs = $s_code AND s_id = $sid");
-                        oci_execute($getgpa);
-
-                        while ($d = oci_fetch_array($getgpa)) {
-                            $hrs = $d['SUBJECT_CREDIT_HRS'];
-                        }
-
+                 
                         $currentDate = date('Y-m-d');
-                        $pro_gpa_hrs = $gpa * $hrs;
-
                         // Check if a record already exists
                         $check_cum = oci_parse($conn, "SELECT COUNT(*) AS RECORD_COUNT FROM STUDENT_CUMULATIVE WHERE S_ID = $sid AND sub_code = $sub_code AND subj_code = $s_code AND stud_id = '$stud_id'");
                         oci_execute($check_cum);
@@ -290,8 +273,8 @@ include('auto_logout.php');
                             oci_fetch_all($check_cum, $result);
 
                             if ($result['RECORD_COUNT'][0] <= 9) {
-                                $cumulative = oci_parse($conn, "INSERT INTO STUDENT_CUMULATIVE (S_ID, STUD_ID, ACADEMIC_YEAR, TERM, ENTRY_DT, SUB_CODE, SUBJ_CODE, MARK, G_CODE, GPA, CREDIT_HRS, TOTAL_GPA_CREDIT) 
-                          VALUES ($sid, '$stud_id', '$a_y', '$t', '$currentDate', $s_code, $sub_code, $total, $g_code, $gpa, $hrs, $pro_gpa_hrs)");
+                                $cumulative = oci_parse($conn, "INSERT INTO STUDENT_CUMULATIVE (S_ID, STUD_ID, ACADEMIC_YEAR, TERM, ENTRY_DT, SUB_CODE, SUBJ_CODE, MARK, G_CODE) 
+                          VALUES ($sid, '$stud_id', '$a_y', '$t', '$currentDate', $s_code, $sub_code, $total, $g_code)");
                                 oci_execute($cumulative);
                             }
                         }

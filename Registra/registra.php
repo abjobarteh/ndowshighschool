@@ -183,7 +183,7 @@ $sid = $_SESSION['sid'];
                             <a href="select_class_report.php">Generate Student Term Report Card</a>
                         </li>
                         <li class="item">
-                            <a href="#">Generate Student Term Report/Transcript</a>
+                            <a href="transcript">Generate Student Term Report/Transcript</a>
                         </li>
                         <li class="item">
                             <a href="Marks.php">Generate Report For Missing Marks</a>

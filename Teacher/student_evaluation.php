@@ -186,8 +186,8 @@ if ($row = oci_fetch_array($sql)) {
                     $sql = oci_parse($conn, "select * from student_evaluation where emp_id = '$emp_id' and sub_code = $sub_code and class_code = $s_code and stud_id = '$st' AND term = '$t' ");
                     oci_execute($sql);
                     if (oci_fetch_all($sql, $a) == 0) {
-                        $cas_mark = 0.3*$cas_mark;
-                        $exam_mark = 0.7*$exam_mark;
+                        $cas_mark = 1*$cas_mark;
+                        $exam_mark = 1*$exam_mark;
                         $sql = oci_parse($conn, "INSERT INTO STUDENT_EVALUATION (S_ID,SUB_CODE,STUD_ID,EMP_ID,ACADEMIC_YEAR,TERM,CONST_ASS,EXAM,ENTRY_DT,CLASS_CODE,MARK_STATUS)
                        VALUES  ($sid,$sub_code,'$st','$emp_id','$a_y','$t',$cas_mark,$exam_mark,sysdate,$s_code,'PENDING')");
                         if (oci_execute($sql)) {

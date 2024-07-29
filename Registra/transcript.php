@@ -13,8 +13,13 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" />
-    <?php include('connect.php');
-    ob_start();  ?>
+    <?php
+    ob_start();
+    include('auto_logout.php');
+    include('connect.php');
+    $school =  $_SESSION['school'];
+    $sid = $_SESSION['sid'];
+    ?>
     <title>Transcript</title>
 </head>
 <style>
@@ -88,717 +93,701 @@
                 </a>
             </button>
         </div>
-        <header>Customer</header>
-        <form method="POST" action="customer" enctype="multipart/form-data">
+        <header>Transcript</header>
+        <form method="POST" action="transcript" enctype="multipart/form-data">
             <div class="form first">
                 <div class="details personal">
-                    <span class="title">Add Customer</span>
-                    <div class="fields">
-                        <div class="input-field" style="   display: flex;
+                    <span class="title">Create Transcript</span>
+
+
+                    <div class="details personal">
+                        <span class="title">Add Student Academic Records</span>
+
+                        <div class="fields">
+                            <div class="input-field" style="   display: flex;
     flex-direction: column;
     margin-bottom: 15px;
     width: calc(75% / 4 - 10px);">
-                            <label>Customer</label>
-                            <select name="select_cust_type" required>
-                                <option disabled selected>Select Customer Type</option>
-                                <?php
-                                $sql = oci_parse($conn, "SELECT * FROM CUSTOMER_TYPE ORDER BY TYPE_ID");
-                                oci_execute($sql);
-                                while ($row = oci_fetch_array($sql)) {
-                                    echo '<option value="' . $row["TYPE_ID"] . '">' . strtoupper($row["TYPE"]) . '</option>';
-                                }
-                                ?>
-                            </select>
-                        </div>
-                        <div class="input-field">
-                            <label>Customer Name</label>
-                            <input type="text" placeholder="Enter Customer Name" pattern="[A-z ]+" title="Only Letters" name="c_name">
-                        </div>
+                                <label>Existing Student</label>
+                                <select name="select_exist_student" required>
+                                    <option disabled selected>Select Student</option>
+                                    <?php
+                                    $sql = oci_parse($conn, "SELECT * FROM STUDENT ORDER BY NAME");
+                                    oci_execute($sql);
+                                    while ($row = oci_fetch_array($sql)) {
+                                        echo '<option value="' . $row["STUD_ID"] . '">' . strtoupper($row["NAME"]) . ' ' . strtoupper($row['STUD_ID']) . '</option>';
+                                    }
+                                    ?>
+                                </select>
+                            </div>
 
-                        <div class="input-field">
-                            <label>Customer Address</label>
-                            <input type="text" placeholder="Enter Customer Address" name="c_address" pattern="[A-z0-9 ]+">
-                        </div>
-                        <div class="input-field">
-                            <label>Town</label>
-                            <select name="select_town" required>
-                                <option disabled selected>Select Town</option>
-                                <?php
-                                $sql = oci_parse($conn, "SELECT * FROM TOWN ORDER BY TOWN_CODE");
-                                oci_execute($sql);
-                                while ($row = oci_fetch_array($sql)) {
-                                    echo '<option value="' . $row["TOWN_CODE"] . '">' . strtoupper($row["TOWN"]) . '</option>';
-                                }
-                                ?>
-                            </select>
-                        </div>
-                        <div class="input-field" style="   display: flex;
+                            <div class="input-field" style="   display: flex;
     flex-direction: column;
     margin-bottom: 15px;
-    width: calc(75% / 3 - 10px);">
-                            <label>Customer Primary Number</label>
-                            <input type="number" placeholder="Enter Customer Primary Number" name="c_pri_no" pattern="[0-9]+" maxlength="7">
-                        </div>
-                        <div class="input-field" style="   display: flex;
+    width: calc(75% / 4 - 10px);">
+                                <label>Term</label>
+                                <select name="select_term" required>
+                                    <option disabled selected>Select Term</option>
+                                    <?php
+                                    $sql = oci_parse($conn, "SELECT * FROM TERM_CALENDAR ORDER BY TERM");
+                                    oci_execute($sql);
+                                    while ($row = oci_fetch_array($sql)) {
+                                        echo '<option value="' . $row["TERM"] . '">' . strtoupper($row["TERM"]) . '</option>';
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+
+                            <div class="input-field" style="   display: flex;
     flex-direction: column;
     margin-bottom: 15px;
-    width: calc(75% / 3 - 10px);">
-                            <label>Customer Secondary Number</label>
-                            <input type="number" placeholder="Enter Customer Secondary Number" name="c_sec_no" pattern="[0-9]+" maxlength="7">
-                        </div>
-                        <div class="input-field">
-                            <label>Customer Email</label>
-                            <input type="email" placeholder="Enter Customer Email" name="c_email">
-                        </div>
+    width: calc(75% / 4 - 10px);">
+                                <label>Class</label>
+                                <select name="select_class" required>
+                                    <option disabled selected>Select Class</option>
+                                    <?php
+                                    $sql = oci_parse($conn, "SELECT * FROM SUB_CLASS ORDER BY CLASS_NAME");
+                                    oci_execute($sql);
+                                    while ($row = oci_fetch_array($sql)) {
+                                        echo '<option value="' . $row["SUB_CODE"] . '">' . strtoupper($row["CLASS_NAME"]) . '</option>';
+                                    }
+                                    ?>
+                                </select>
+                            </div>
 
-                        <div class="input-field">
-                            <label>Customer ID Number</label>
-                            <input type="text" placeholder="Enter Customer ID Number" name="c_id_no" pattern="[A-z0-9.]+" maxlength="7">
-                        </div>
-
-                        <div class="input-field">
-                            <label>Customer VAT/TIN Number</label>
-                            <input type="number" placeholder="Enter Customer VAT/TIN Number" title="Enter VAT Rate" name="c_vat_tin_no" pattern="[0-9.]+" maxlength="7">
-                        </div>
-                        <div class="input-field" style=" display: flex;
+                            <div class="input-field" style="   display: flex;
     flex-direction: column;
     margin-bottom: 15px;
-    width: calc(85% / 4 - 10px);">
-                            <label>Customer Credit Rating</label>
-                            <select name="select_customer_rating" required>
-                                <option disabled selected>Select Customer Rating</option>
-                                <?php
-                                $sql = oci_parse($conn, "SELECT * FROM CUSTOMER_CREDIT_RATING ORDER BY RATING_CODE");
-                                oci_execute($sql);
-                                while ($row = oci_fetch_array($sql)) {
-                                    echo '<option value="' . $row["RATING_CODE"] . '">' . strtoupper($row["RATING"]) . '</option>';
-                                }
-                                ?>
-                            </select>
+    width: calc(75% / 4 - 10px);">
+                                <label>Subject</label>
+                                <select name="select_subject" required>
+                                    <option disabled selected>Select Subject</option>
+                                    <?php
+                                    $sql = oci_parse($conn, "SELECT * FROM WAEC_SUBJECT ORDER BY SUBJECT");
+                                    oci_execute($sql);
+                                    while ($row = oci_fetch_array($sql)) {
+                                        echo '<option value="' . $row["SUB_CODE"] . '">' . strtoupper($row["SUBJECT"]) . '</option>';
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                            <div class="input-field" style="   display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+    width: calc(70% / 5 - 10px);">
+                                <label>Student Mark</label>
+                                <input type="number" placeholder="Enter Student Mark" name="mark" min=0 max=100>
+                            </div>
+                            <button class="nextBtn" name="save_btn" style="display: flex; align-items: center; justify-content: center; height: 45px; max-width: 350px; width: 100%; border: none; outline: none; color: #fff; border-radius: 5px; margin: 25px 0; background-color: #909290; transition: all 0.3s linear; cursor: pointer; margin-left: 10px;">
+                                <span class="btnText">SAVE STUDENT ACADEMIC RECORDS</span>
+                                <i class="uil uil-save"></i>
+                            </button>
                         </div>
-                        <button class="nextBtn" name="save_btn">
-                            <span class="btnText">SAVE</span>
-                            <i class="uil uil-save"></i>
-                        </button>
                     </div>
                 </div>
-
-
 
                 <div class="details personal">
-                    <span class="title">Edit Customer</span>
-                    <div class="fields">
-                        <div class="input-field" style=" display: flex;
-    flex-direction: column;
-    margin-bottom: 15px;
-    width: calc(85% / 3 - 10px);">
-                            <label>Customer </label>
-                            <select name="select_customer" required>
-                                <option disabled selected>Select Customer </option>
-                                <?php
-                                $sql = oci_parse($conn, "SELECT * FROM CUSTOMER ORDER BY CUST_ID");
-                                oci_execute($sql);
-                                while ($row = oci_fetch_array($sql)) {
-                                    echo '<option value="' . $row["CUST_ID"] . '">' . strtoupper($row["NAME"]) . '</option>';
-                                }
-                                ?>
-                            </select>
-                        </div>
-                        <div class="input-field" style="display: flex;
-    flex-direction: column;
-    margin-bottom: 15px;
-    width: calc(85% / 3 - 10px);">
-                            <label>Field To Update</label>
-                            <select name="field" required>
-                                <option disabled selected>Select Field</option>
-                                <option>TYPE</option>
-                                <option>NAME</option>
-                                <option>ADDRESS</option>
-                                <option>TOWN</option>
-                                <option>PRIMARY LINE</option>
-                                <option>SECONDARY LINE</option>
-                                <option>EMAIL</option>
-                                <option>VAT/TIN NUMBER</option>
-                                <option>ID NUMBER</option>
-                                <option>CREDIT RATING</option>
-                            </select>
-                        </div>
-                        <div class="input-field" style="   display: flex;
+                    <div class="details personal">
+                        <span class="title">Add Student Activities And Responsibilities</span>
+
+                        <div class="fields">
+                            <div class="input-field" style="   display: flex;
     flex-direction: column;
     margin-bottom: 15px;
     width: calc(75% / 4 - 10px);">
-                            <label>Customer Type</label>
-                            <select name="edit_select_cust_type" required>
-                                <option disabled selected>Select Customer Type</option>
-                                <?php
-                                $sql = oci_parse($conn, "SELECT * FROM CUSTOMER_TYPE ORDER BY TYPE_ID");
-                                oci_execute($sql);
-                                while ($row = oci_fetch_array($sql)) {
-                                    echo '<option value="' . $row["TYPE_ID"] . '">' . strtoupper($row["TYPE"]) . '</option>';
-                                }
-                                ?>
-                            </select>
-                        </div>
-                        <div class="input-field">
-                            <label>Customer Name</label>
-                            <input type="text" placeholder="Enter Customer Name" pattern="[A-z ]+" title="Only Letters" name="edit_c_name">
-                        </div>
-                        <div class="input-field">
-                            <label>Customer Address</label>
-                            <input type="text" placeholder="Enter Customer Address" name="edit_c_address" pattern="[A-z0-9 ]+">
-                        </div>
-                        <div class="input-field">
-                            <label>Town</label>
-                            <select name="edit_select_town" required>
-                                <option disabled selected>Select Town</option>
-                                <?php
-                                $sql = oci_parse($conn, "SELECT * FROM TOWN ORDER BY TOWN_CODE");
-                                oci_execute($sql);
-                                while ($row = oci_fetch_array($sql)) {
-                                    echo '<option value="' . $row["TOWN_CODE"] . '">' . strtoupper($row["TOWN"]) . '</option>';
-                                }
-                                ?>
-                            </select>
-                        </div>
-                        <div class="input-field" style="   display: flex;
+                                <label>Existing Student</label>
+                                <select name="select_existstudent" required>
+                                    <option disabled selected>Select Student</option>
+                                    <?php
+                                    $sql = oci_parse($conn, "SELECT * FROM STUDENT ORDER BY NAME");
+                                    oci_execute($sql);
+                                    while ($row = oci_fetch_array($sql)) {
+                                        echo '<option value="' . $row["STUD_ID"] . '">' . strtoupper($row["NAME"]) . ' ' . strtoupper($row['STUD_ID']) . '</option>';
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                            <div class="input-field" style="   display: flex;
     flex-direction: column;
     margin-bottom: 15px;
-    width: calc(75% / 3 - 10px);">
-                            <label>Customer Primary Number</label>
-                            <input type="number" placeholder="Enter Customer Primary Number" name="edit_c_pri_no" pattern="[0-9]+" maxlength="7">
-                        </div>
-                        <div class="input-field" style="   display: flex;
+    width: calc(75% / 6 - 10px);">
+                                <label>Class</label>
+                                <select name="class" required>
+                                    <option disabled selected>Select Class</option>
+                                    <?php
+                                    $sql = oci_parse($conn, "SELECT * FROM CLASS ORDER BY CLASS");
+                                    oci_execute($sql);
+                                    while ($row = oci_fetch_array($sql)) {
+                                        echo '<option value="' . $row["CLASS"] . '">' . strtoupper($row["CLASS_TITLE"])  . '</option>';
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                            <div class="input-field" style=" display: flex;
     flex-direction: column;
     margin-bottom: 15px;
-    width: calc(75% / 3 - 10px);">
-                            <label>Customer Secondary Number</label>
-                            <input type="number" placeholder="Enter Customer Secondary Number" name="edit_c_sec_no" pattern="[0-9]+" maxlength="7">
-                        </div>
-                        <div class="input-field">
-                            <label>Customer Email</label>
-                            <input type="email" placeholder="Enter Customer Email" name="edit_c_email">
-                        </div>
+    width: calc(85% / 3 - 10px);">
+                                <label>Activities</label>
+                                <input type="text" placeholder="Enter Student Activities" name="stu_act">
+                            </div>
+                            <div class="input-field" style=" display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+    width: calc(85% / 3 - 10px);">
+                                <label>Responsibilities</label>
+                                <input type="text" placeholder="Enter Student Responsibilities" name="stu_resp">
+                            </div>
+                            <button class="nextBtn" name="save_act_btn" style="display: flex; align-items: center; justify-content: center; height: 45px; max-width: 350px; width: 100%; border: none; outline: none; color: #fff; border-radius: 5px; margin: 25px 0; background-color: #909290; transition: all 0.3s linear; cursor: pointer; margin-left: 10px;">
+                                <span class="btnText">SAVE STUDENT ACTIVITIES RECORDS</span>
+                                <i class="uil uil-save"></i>
+                            </button>
+                            <button class="nextBtn" name="save_resp_btn" style="display: flex; align-items: center; justify-content: center; height: 45px; max-width: 450px; width: 100%; border: none; outline: none; color: #fff; border-radius: 5px; margin: 25px 0; background-color: #909290; transition: all 0.3s linear; cursor: pointer; margin-left: 10px;">
+                                <span class="btnText">SAVE STUDENT  RESPONSIBILITIES RECORDS</span>
+                                <i class="uil uil-save"></i>
+                            </button>
 
-                        <div class="input-field">
-                            <label>Customer ID Number</label>
-                            <input type="text" placeholder="Enter Customer ID Number" name="edit_c_id_no" pattern="[A-z0-9.]+" maxlength="7">
                         </div>
-
-                        <div class="input-field">
-                            <label>Customer VAT/TIN Number</label>
-                            <input type="number" placeholder="Enter Customer VAT/TIN Number" name="edit_c_vat_tin_no" pattern="[0-9.]+" maxlength="7">
-                        </div>
-                        <div class="input-field" style=" display: flex;
-    flex-direction: column;
-    margin-bottom: 15px;
-    width: calc(85% / 4 - 10px);">
-                            <label>Customer Credit Rating</label>
-                            <select name="edit_select_customer_rating" required>
-                                <option disabled selected>Select Customer Rating</option>
-                                <?php
-                                $sql = oci_parse($conn, "SELECT * FROM CUSTOMER_CREDIT_RATING ORDER BY RATING_CODE");
-                                oci_execute($sql);
-                                while ($row = oci_fetch_array($sql)) {
-                                    echo '<option value="' . $row["RATING_CODE"] . '">' . strtoupper($row["RATING"]) . '</option>';
-                                }
-                                ?>
-                            </select>
-                        </div>
-                        <button class="nextBtn" name="edit_btn">
-                            <span class="btnText">EDIT</span>
-                            <i class="uil uil-edit"></i>
-                        </button>
                     </div>
                 </div>
-            </div>
-
-            <div class="buttons" style="display: flex; align-items: center;">
-                <button id="showcompanyBtn" type="button" class="backBtn" style="display: flex; align-items: center; justify-content: center; height: 45px; max-width: 250px; width: 100%; border: none; outline: none; color: #fff; border-radius: 5px; margin: 25px 0; background-color: #909290; transition: all 0.3s linear; cursor: pointer;">
-                    <span class="btnText" style="font-size: 15px; color: white; text-decoration: none;">
-                        VIEW CUSTOMER DETAILS
-                    </span>
-                    <i class="fa-solid fa-eye"></i>
-                </button>
-            </div>
+                <div class="buttons" style="display: flex; align-items: center;">
+                    <button id="showcompanyBtn" type="button" class="backBtn" style="display: flex; align-items: center; justify-content: center; height: 45px; max-width: 250px; width: 100%; border: none; outline: none; color: #fff; border-radius: 5px; margin: 25px 0; background-color: #909290; transition: all 0.3s linear; cursor: pointer;">
+                        <span class="btnText" style="font-size: 15px; color: white; text-decoration: none;">
+                            GENERATE TRANSCRIPT
+                        </span>
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
         </form>
         <div class="footer">
             <p style="font-size: 19px; color: #909290; flex-basis: 100%; font-weight: bold">Developed and Powered By Nifty ICT Solutions Ltd</p>
             <p style="font-size: 19px; color: #909290; flex-basis: 100%; font-weight: bold">Phone: +2209067411 | Website: www.niftyict.com | Email: enquiries@niftyict.com</p>
         </div>
     </div>
-    <script src="js/input.js"></script>
 
-    <div id="regionsModal" class="modal">
-        <!-- Modal content -->
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Customer</h2>
-            <table id="regionsTable">
-                <thead>
-                    <tr>
-                        <th>Customer ID</th>
-                        <th>Customer Type</th>
-                        <th>Customer Name</th>
-                        <th>Customer Address</th>
-                        <th>Customer Town</th>
-                        <th>Customer Email</th>
-                        <th>Customer VAT/TIN Number</th>
-                        <th>Customer Identification Number</th>
-                        <th>Customer Credit Rating</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    $sql = oci_parse($conn, "SELECT * FROM CUSTOMER A JOIN CUSTOMER_TYPE B ON (A.TYPE_ID=B.TYPE_ID) JOIN CUSTOMER_CREDIT_RATING C ON (A.RATING_CODE=C.RATING_CODE) JOIN TOWN D ON (A.TOWN_CODE=D.TOWN_CODE) ORDER BY A.CUST_ID");
-                    oci_execute($sql);
-                    while ($row = oci_fetch_array($sql)) {
-                        echo '<tr>';
-                        echo '<td>' . $row["CUST_ID"] . '</td>';
-                        echo '<td>' . $row["TYPE"] . '</td>';
-                        echo '<td>' . $row["NAME"] . '</td>';
-                        echo '<td>' . $row["ADDRESS"] . '</td>';
-                        echo '<td>' . $row["TOWN"] . '</td>';
-                        echo '<td>' . $row["EMAIL"] . '</td>';
-                        echo '<td>' . $row["VAT_TIN_NO"] . '</td>';
-                        echo '<td>' . $row["ID_NO"] . '</td>';
-                        echo '<td>' . $row["RATING"] . '</td>';
-                        echo '</tr>';
-                    }
-                    ?>
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <script>
-        // Get the modal
-        var modal = document.getElementById("regionsModal");
-
-        // Get the button that opens the modal
-        var btn = document.getElementById("showcompanyBtn");
-
-        // Get the <span> element that closes the modal
-        var span = document.getElementsByClassName("close")[0];
-
-        // When the user clicks the button, open the modal 
-        btn.onclick = function(event) {
-            event.preventDefault(); // Prevent form submission
-            modal.style.display = "block";
-        }
-
-        // When the user clicks on <span> (x), close the modal
-        span.onclick = function() {
-            modal.style.display = "none";
-        }
-
-        // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
-        }
-    </script>
     <?php
+
+    if (isset($_POST['save_act_btn'])) {
+        if (isset($_POST['select_existstudent'])) {
+            if (($_POST['stu_act']) != '') {
+               $sql = oci_parse($conn,"SELECT * FROM STUDENT_ACTIVITIES WHERE STUD_ID = :ID ");
+               oci_bind_by_name($sql,":ID",$_POST['select_existstudent']);
+               oci_execute($sql);
+               if(oci_fetch_all($sql,$a)>0){
+                  $sql = oci_parse($conn,"UPDATE STUDENT_ACTIVITIES SET ACT =:ACT WHERE STUD_ID =:ID ");
+                  oci_bind_by_name($sql,":ID",$_POST['select_existstudent']);
+                  $act = strtoupper($_POST['stu_act']);
+                  oci_bind_by_name($sql,":ACT",$act);
+                if(oci_execute($sql)){
+                    echo "<script> Swal.fire({
+                        title: 'STUDENT ACTIVITIES RECORD SAVED SUCCESSFULLY',
+                        icon: 'success',
+                        showConfirmButton: true
+                    });</script>";
+                }else {
+                    echo "<script> Swal.fire({
+                        title: 'ERROR ADDING STUDENT ACTIVITIES RECORD',
+                        icon: 'error',
+                        showConfirmButton: true
+                    });</script>";
+                }
+               }else {
+                $sql = oci_parse($conn,"INSERT INTO STUDENT_ACTIVITIES (S_ID,STUD_ID,ACT) VALUES (:S_ID,:ID,:ACT) ");
+                oci_bind_by_name($sql,":ID",$_POST['select_existstudent']);
+                $act = strtoupper($_POST['stu_act']);
+                oci_bind_by_name($sql,":ACT",$act);
+                oci_bind_by_name($sql,":S_ID",$sid);
+              if(oci_execute($sql)){
+                  echo "<script> Swal.fire({
+                      title: 'STUDENT ACTIVITIES RECORD SAVED SUCCESSFULLY',
+                      icon: 'success',
+                      showConfirmButton: true
+                  });</script>";
+              }else {
+                  echo "<script> Swal.fire({
+                      title: 'ERROR ADDING STUDENT ACTIVITIES RECORD',
+                      icon: 'error',
+                      showConfirmButton: true
+                  });</script>";
+              }
+               }
+
+            } else {
+                echo "<script> Swal.fire({
+                    title: 'ENTER STUDENT ACTIVITIES',
+                    icon: 'warning',
+                    showConfirmButton: true
+                });</script>";
+            }
+        } else {
+            echo "<script> Swal.fire({
+                title: 'SELECT STUDENT',
+                icon: 'warning',
+                showConfirmButton: true
+            });</script>";
+        }
+    }
+
     if (isset($_POST['save_btn'])) {
-        if (isset($_POST['select_cust_type'])) {
-            if ($_POST['c_name'] != '') {
-                if(isset($_POST['select_town'])){
-                    if ($_POST['c_address'] != '') {
-                        if ($_POST['c_pri_no'] != '') {
-                            if ($_POST['c_sec_no'] != '') {
-    
-                                if (isset($_POST['select_customer_rating'])) {
-    
-                                    $sql = oci_parse($conn, "INSERT INTO CUSTOMER (NAME,ADDRESS,PRIMARY_LINE,SECONDARY_LINE,EMAIL,VAT_TIN_NO,ID_NO,TYPE_ID,RATING_CODE,TOWN_CODE) 
-                                                VALUES (:NAME,:ADDRESS,:P_LINE,:S_LINE,:EMAIL,:VAT_TIN,:ID,:TYPE_ID,:R_CODE,:T_CODE)");
-    
-                                    oci_bind_by_name($sql, ":NAME", strtoupper($_POST['c_name']));
-                                    oci_bind_by_name($sql, ":ADDRESS", strtoupper($_POST['c_address']));
-                                    oci_bind_by_name($sql, ":P_LINE", $_POST['c_pri_no']);
-                                    oci_bind_by_name($sql, ":S_LINE", $_POST['c_sec_no']);
-                                    oci_bind_by_name($sql, ":EMAIL", strtoupper($_POST['c_email']));
-                                    oci_bind_by_name($sql, ":VAT_TIN", $_POST['c_vat_tin_no']);
-                                    oci_bind_by_name($sql, ":ID", strtoupper($_POST['c_id_no']));
-                                    oci_bind_by_name($sql, ":TYPE_ID", strtoupper($_POST['select_cust_type']));
-                                    oci_bind_by_name($sql, ":R_CODE", $_POST['select_customer_rating']);
-                                    oci_bind_by_name($sql, ":T_CODE", $_POST['select_town']);
-    
-                                    if (oci_execute($sql)) {
-                                        echo "<script> Swal.fire({
-                            title: '" . strtoupper($_POST['c_name']) . " ADDED AS CUSTOMER SUCCESSFULLY',
-                            icon: 'success',
-                            showConfirmButton: true
-                        });</script>";
-                                        header("refresh:2;");
-                                    } else {
-                                        echo "<script> Swal.fire({
-                                                title: 'ERROR ADDING CUSTOMER',
+
+        if (isset($_POST['select_exist_student'])) {
+            $id = strtoupper(trim($_POST['select_exist_student']));
+            if (isset($_POST['select_term'])) {
+                if (isset($_POST['select_class'])) {
+                    if (isset($_POST['select_subject'])) {
+                        if ($_POST['mark'] != '') {
+                            $mark = floatval($_POST['mark']);
+                            $emp_id = 20240726221;
+                            $ca = $mark * 0.3;
+                            $exam = $mark * 0.7;
+                            $total = $exam + $ca;
+
+                            $sql = oci_parse($conn, "SELECT * FROM TERM_CALENDAR WHERE TERM =:TERM");
+                            oci_bind_by_name($sql, ":TERM", $_POST['select_term']);
+                            oci_execute($sql);
+
+                            while ($get = oci_fetch_array($sql)) {
+                                $acad_year = $get['ACADEMIC_YEAR'];
+                            }
+
+                            $sql = oci_parse($conn, "SELECT * FROM STUDENT_EVALUATION WHERE SUB_CODE=:SUB_CODE AND CLASS_CODE =:CLASS_CODE AND STUD_ID=:ID AND TERM =:TERM");
+                            oci_bind_by_name($sql, ":CLASS_CODE", $_POST['select_class']);
+                            oci_bind_by_name($sql, ":ID", $id);
+                            oci_bind_by_name($sql, ":SUB_CODE", $_POST['select_subject']);
+                            oci_bind_by_name($sql, ":TERM", $_POST['select_term']);
+                            oci_execute($sql);
+                            if (oci_fetch_all($sql, $a) > 0) {
+                                $sql = oci_parse($conn, "UPDATE STUDENT_EVALUATION SET CONST_ASS = :CA,EXAM=:EXAM, ENTRY_DT = SYSDATE,EMP_ID=:EMP_ID WHERE SUB_CODE=:SUB_CODE AND CLASS_CODE =:CLASS_CODE AND STUD_ID=:ID AND TERM =:TERM ");
+                                oci_bind_by_name($sql, ":CLASS_CODE", $_POST['select_class']);
+                                oci_bind_by_name($sql, ":ID", $id);
+                                oci_bind_by_name($sql, ":SUB_CODE", $_POST['select_subject']);
+                                oci_bind_by_name($sql, ":TERM", $_POST['select_term']);
+                                oci_bind_by_name($sql, ":EMP_ID", $emp_id);
+                                oci_bind_by_name($sql, ":CA", $ca);
+                                oci_bind_by_name($sql, ":EXAM", $exam);
+                                if (oci_execute($sql)) {
+
+                                    $getgrade = oci_parse($conn, "SELECT * FROM GRADE A JOIN GRADE_SETTING B ON A.G_CODE = B.G_CODE WHERE B.START_GRADE_RANGE <= CAST($total AS INT) AND CAST($total AS INT) <= B.END_GRADE_RANGE  ORDER BY A.GRADE");
+                                    oci_execute($getgrade);
+
+                                    while ($b = oci_fetch_array($getgrade)) {
+                                        $g_code = $b["G_CODE"];
+                                        $grade = $b["GRADE"];
+                                    }
+
+                                    $sql = oci_parse($conn, "SELECT * FROM STUDENT_CUMULATIVE WHERE SUBJ_CODE=:SUB_CODE AND SUB_CODE =:CLASS_CODE AND STUD_ID=:ID AND TERM =:TERM");
+                                    oci_bind_by_name($sql, ":CLASS_CODE", $_POST['select_class']);
+                                    oci_bind_by_name($sql, ":ID", $id);
+                                    oci_bind_by_name($sql, ":SUB_CODE", $_POST['select_subject']);
+                                    oci_bind_by_name($sql, ":TERM", $_POST['select_term']);
+                                    oci_execute($sql);
+
+                                    if (oci_fetch_all($sql, $a) > 0) {
+                                        $sql = oci_parse($conn, "UPDATE STUDENT_CUMULATIVE SET MARK =:MARK,ENTRY_DT = SYSDATE, G_CODE= :G_CODE WHERE SUBJ_CODE=:SUB_CODE AND SUB_CODE =:CLASS_CODE AND STUD_ID=:ID AND TERM =:TERM");
+                                        oci_bind_by_name($sql, ":CLASS_CODE", $_POST['select_class']);
+                                        oci_bind_by_name($sql, ":ID", $id);
+                                        oci_bind_by_name($sql, ":SUB_CODE", $_POST['select_subject']);
+                                        oci_bind_by_name($sql, ":TERM", $_POST['select_term']);
+                                        oci_bind_by_name($sql, ":MARK", $total);
+                                        oci_bind_by_name($sql, ":G_CODE", $g_code);
+
+                                        if (oci_execute($sql)) {
+                                            $sql = oci_parse($conn, "SELECT * FROM STUDENT_STANDINGS WHERE TERM = :TERM AND STUD_ID = :ID AND CLASS_CODE =:CLASS_CODE");
+                                            oci_bind_by_name($sql, ":ID", $id);
+                                            oci_bind_by_name($sql, ":TERM", $_POST['select_term']);
+                                            oci_bind_by_name($sql, ":CLASS_CODE", $_POST['select_class']);
+
+                                            oci_execute($sql);
+                                            if (oci_fetch_all($sql, $a) > 0) {
+                                                $sql = oci_parse($conn, "SELECT ROUND(AVG(MARK),2) AS AVERAGE FROM STUDENT_CUMULATIVE WHERE TERM = :TERM AND STUD_ID = :ID AND SUB_CODE =:CLASS_CODE");
+                                                oci_bind_by_name($sql, ":ID", $id);
+                                                oci_bind_by_name($sql, ":TERM", $_POST['select_term']);
+                                                oci_bind_by_name($sql, ":CLASS_CODE", $_POST['select_class']);
+                                                oci_execute($sql);
+                                                while ($get = oci_fetch_array($sql)) {
+                                                    $avg = $get['AVERAGE'];
+                                                }
+                                                $getgrade = oci_parse($conn, "SELECT * FROM GRADE A JOIN GRADE_SETTING B ON A.G_CODE = B.G_CODE WHERE B.START_GRADE_RANGE <= CAST($avg AS INT) AND CAST($avg AS INT) <= B.END_GRADE_RANGE  ORDER BY A.GRADE");
+                                                oci_execute($getgrade);
+
+                                                while ($b = oci_fetch_array($getgrade)) {
+                                                    $g_code = $b["G_CODE"];
+                                                    $grade = $b["GRADE"];
+                                                }
+
+                                                $sql = oci_parse($conn, "SELECT * FROM GPA WHERE G_CODE = :G_CODE");
+                                                oci_bind_by_name($sql, ":G_CODE", $g_code);
+                                                oci_execute($sql);
+                                                while ($get = oci_fetch_array($sql)) {
+                                                    $gpa = $get['GPA'];
+                                                }
+
+                                                $sql = oci_parse($conn, "UPDATE STUDENT_STANDINGS SET GPA = :GPA , AVERAGE=:AVERAGE WHERE STUD_ID=:ID AND TERM =:TERM AND CLASS_CODE =:CLASS_CODE ");
+                                                oci_bind_by_name($sql, ":GPA", $gpa);
+                                                oci_bind_by_name($sql, ":AVERAGE", $avg);
+                                                oci_bind_by_name($sql, ":CLASS_CODE", $_POST['select_class']);
+                                                oci_bind_by_name($sql, ":ID", $id);
+                                                oci_bind_by_name($sql, ":TERM", $_POST['select_term']);
+                                                if (oci_execute($sql)) {
+                                                    echo "<script> Swal.fire({
+                                                        title: 'RECORD SAVED SUCCESSFULLY',
+                                                        icon: 'success',
+                                                        showConfirmButton: true
+                                                    });</script>";
+                                                } else {
+                                                    echo "<script> Swal.fire({
+                                                        title: 'ERROR SAVING RECORD',
+                                                        icon: 'error',
+                                                        showConfirmButton: true
+                                                    });</script>";
+                                                }
+                                            } else {
+                                                $sql = oci_parse($conn, "SELECT ROUND(AVG(MARK),2) AS AVERAGE FROM STUDENT_CUMULATIVE WHERE TERM = :TERM AND STUD_ID = :ID AND SUB_CODE =:CLASS_CODE");
+                                                oci_bind_by_name($sql, ":ID", $id);
+                                                oci_bind_by_name($sql, ":TERM", $_POST['select_term']);
+                                                oci_bind_by_name($sql, ":CLASS_CODE", $_POST['select_class']);
+                                                oci_execute($sql);
+                                                while ($get = oci_fetch_array($sql)) {
+                                                    $avg = $get['AVERAGE'];
+                                                }
+
+                                                $getgrade = oci_parse($conn, "SELECT * FROM GRADE A JOIN GRADE_SETTING B ON A.G_CODE = B.G_CODE WHERE B.START_GRADE_RANGE <= CAST($avg AS INT) AND CAST($avg AS INT) <= B.END_GRADE_RANGE  ORDER BY A.GRADE");
+                                                oci_execute($getgrade);
+
+                                                while ($b = oci_fetch_array($getgrade)) {
+                                                    $g_code = $b["G_CODE"];
+                                                    $grade = $b["GRADE"];
+                                                }
+
+                                                $sql = oci_parse($conn, "SELECT * FROM GPA WHERE G_CODE = :G_CODE");
+                                                oci_bind_by_name($sql, ":G_CODE", $g_code);
+                                                oci_execute($sql);
+                                                while ($get = oci_fetch_array($sql)) {
+                                                    $gpa = $get['GPA'];
+                                                }
+
+                                                $sql = oci_parse($conn, "INSERT INTO STUDENT_STANDINGS (CLASS_CODE,GPA,AVERAGE,STUD_ID,TERM,ACADEMIC_YEAR,S_ID,STATUS) VALUES (:CLASS_CODE,:GPA,:AVERAGE,:ID,:TERM,:A_Y,:S_ID,'COMPILED')");
+                                                oci_bind_by_name($sql, ":GPA", $gpa);
+                                                oci_bind_by_name($sql, ":AVERAGE", $avg);
+                                                oci_bind_by_name($sql, ":CLASS_CODE", $_POST['select_class']);
+                                                oci_bind_by_name($sql, ":ID", $id);
+                                                oci_bind_by_name($sql, ":S_ID", $sid);
+                                                oci_bind_by_name($sql, ":TERM", $_POST['select_term']);
+                                                oci_bind_by_name($sql, ":A_Y", $acad_year);
+                                                if (oci_execute($sql)) {
+                                                    echo "<script> Swal.fire({
+                                                        title: 'RECORD SAVED SUCCESSFULLY',
+                                                        icon: 'success',
+                                                        showConfirmButton: true
+                                                    });</script>";
+                                                } else {
+                                                    echo "<script> Swal.fire({
+                                                        title: 'ERROR SAVING RECORD',
+                                                        icon: 'error',
+                                                        showConfirmButton: true
+                                                    });</script>";
+                                                }
+                                            }
+                                        } else {
+                                            echo "<script> Swal.fire({
+                                                title: 'ERROR SAVING RECORD',
                                                 icon: 'error',
-                                                showConxo9i sirmButton: true
+                                                showConfirmButton: true
                                             });</script>";
+                                        }
+                                    } else {
+                                        $getgrade = oci_parse($conn, "SELECT * FROM GRADE A JOIN GRADE_SETTING B ON A.G_CODE = B.G_CODE WHERE B.START_GRADE_RANGE <= CAST($total AS INT) AND CAST($total AS INT) <= B.END_GRADE_RANGE  ORDER BY A.GRADE");
+                                        oci_execute($getgrade);
+
+                                        while ($b = oci_fetch_array($getgrade)) {
+                                            $g_code = $b["G_CODE"];
+                                            $grade = $b["GRADE"];
+                                        }
+                                        $sql = oci_parse($conn, "INSERT INTO STUDENT_CUMULATIVE(S_ID,SUB_CODE,G_CODE,SUBJ_CODE,ACADEMIC_YEAR,TERM,STUD_ID,MARK,ENTRY_DT) VALUES (:S_ID,:CLASS_CODE,:G_CODE,:SUB_CODE,:A_Y,:TERM,:STUD_ID,:MARK,SYSDATE)");
+                                        oci_bind_by_name($sql, ":CLASS_CODE", $_POST['select_class']);
+                                        oci_bind_by_name($sql, ":STUD_ID", $id);
+                                        oci_bind_by_name($sql, ":SUB_CODE", $_POST['select_subject']);
+                                        oci_bind_by_name($sql, ":TERM", $_POST['select_term']);
+                                        oci_bind_by_name($sql, ":A_Y", $acad_year);
+                                        oci_bind_by_name($sql, ":MARK", $total);
+                                        oci_bind_by_name($sql, ":G_CODE", $g_code);
+                                        oci_bind_by_name($sql, ":G_CODE", $g_code);
+                                        oci_bind_by_name($sql, ":S_ID", $sid);
+                                        if (oci_execute($sql)) {
+                                            $sql = oci_parse($conn, "SELECT * FROM STUDENT_STANDINGS WHERE TERM = :TERM AND STUD_ID = :ID AND CLASS_CODE =:CLASS_CODE");
+                                            oci_bind_by_name($sql, ":ID", $id);
+                                            oci_bind_by_name($sql, ":TERM", $_POST['select_term']);
+                                            oci_bind_by_name($sql, ":CLASS_CODE", $_POST['select_class']);
+
+                                            oci_execute($sql);
+                                            if (oci_fetch_all($sql, $a) > 0) {
+                                                $sql = oci_parse($conn, "SELECT ROUND(AVG(MARK),2) AS AVERAGE FROM STUDENT_CUMULATIVE WHERE TERM = :TERM AND STUD_ID = :ID AND SUB_CODE =:CLASS_CODE ");
+                                                oci_bind_by_name($sql, ":ID", $id);
+                                                oci_bind_by_name($sql, ":TERM", $_POST['select_term']);
+                                                oci_bind_by_name($sql, ":CLASS_CODE", $_POST['select_class']);
+                                                oci_execute($sql);
+                                                while ($get = oci_fetch_array($sql)) {
+                                                    $avg = $get['AVERAGE'];
+                                                }
+                                                $getgrade = oci_parse($conn, "SELECT * FROM GRADE A JOIN GRADE_SETTING B ON A.G_CODE = B.G_CODE WHERE B.START_GRADE_RANGE <= CAST($avg AS INT) AND CAST($avg AS INT) <= B.END_GRADE_RANGE  ORDER BY A.GRADE");
+                                                oci_execute($getgrade);
+
+                                                while ($b = oci_fetch_array($getgrade)) {
+                                                    $g_code = $b["G_CODE"];
+                                                    $grade = $b["GRADE"];
+                                                }
+
+                                                $sql = oci_parse($conn, "SELECT * FROM GPA WHERE G_CODE = :G_CODE");
+                                                oci_bind_by_name($sql, ":G_CODE", $g_code);
+                                                oci_execute($sql);
+                                                while ($get = oci_fetch_array($sql)) {
+                                                    $gpa = $get['GPA'];
+                                                }
+
+                                                $sql = oci_parse($conn, "UPDATE STUDENT_STANDINGS SET GPA = :GPA , AVERAGE=:AVERAGE WHERE STUD_ID=:ID AND TERM =:TERM AND CLASS_CODE =:CLASS_CODE ");
+                                                oci_bind_by_name($sql, ":GPA", $gpa);
+                                                oci_bind_by_name($sql, ":AVERAGE", $avg);
+                                                oci_bind_by_name($sql, ":CLASS_CODE", $_POST['select_class']);
+                                                oci_bind_by_name($sql, ":ID", $id);
+                                                oci_bind_by_name($sql, ":TERM", $_POST['select_term']);
+                                                if (oci_execute($sql)) {
+                                                    echo "<script> Swal.fire({
+                                                        title: 'RECORD SAVED SUCCESSFULLY',
+                                                        icon: 'success',
+                                                        showConfirmButton: true
+                                                    });</script>";
+                                                } else {
+                                                    echo "<script> Swal.fire({
+                                                        title: 'ERROR SAVING RECORD',
+                                                        icon: 'error',
+                                                        showConfirmButton: true
+                                                    });</script>";
+                                                }
+                                            } else {
+                                                $sql = oci_parse($conn, "SELECT ROUND(AVG(MARK),2) AS AVERAGE FROM STUDENT_CUMULATIVE WHERE TERM = :TERM AND STUD_ID = :ID AND SUB_CODE =:CLASS_CODE");
+                                                oci_bind_by_name($sql, ":ID", $id);
+                                                oci_bind_by_name($sql, ":TERM", $_POST['select_term']);
+                                                oci_bind_by_name($sql, ":CLASS_CODE", $_POST['select_class']);
+                                                oci_execute($sql);
+                                                while ($get = oci_fetch_array($sql)) {
+                                                    $avg = $get['AVERAGE'];
+                                                }
+                                                $getgrade = oci_parse($conn, "SELECT * FROM GRADE A JOIN GRADE_SETTING B ON A.G_CODE = B.G_CODE WHERE B.START_GRADE_RANGE <= CAST($avg AS INT) AND CAST($avg AS INT) <= B.END_GRADE_RANGE  ORDER BY A.GRADE");
+                                                oci_execute($getgrade);
+
+                                                while ($b = oci_fetch_array($getgrade)) {
+                                                    $g_code = $b["G_CODE"];
+                                                    $grade = $b["GRADE"];
+                                                }
+
+                                                $sql = oci_parse($conn, "SELECT * FROM GPA WHERE G_CODE = :G_CODE");
+                                                oci_bind_by_name($sql, ":G_CODE", $g_code);
+                                                oci_execute($sql);
+                                                while ($get = oci_fetch_array($sql)) {
+                                                    $gpa = $get['GPA'];
+                                                }
+
+                                                $sql = oci_parse($conn, "INSERT INTO STUDENT_STANDINGS (CLASS_CODE,GPA,AVERAGE,STUD_ID,TERM,ACADEMIC_YEAR,S_ID,STATUS) VALUES (:CLASS_CODE,:GPA,:AVERAGE,:ID,:TERM,:A_Y,:S_ID,'COMPILED')");
+                                                oci_bind_by_name($sql, ":GPA", $gpa);
+                                                oci_bind_by_name($sql, ":AVERAGE", $avg);
+                                                oci_bind_by_name($sql, ":CLASS_CODE", $_POST['select_class']);
+                                                oci_bind_by_name($sql, ":ID", $id);
+                                                oci_bind_by_name($sql, ":S_ID", $sid);
+                                                oci_bind_by_name($sql, ":TERM", $_POST['select_term']);
+                                                oci_bind_by_name($sql, ":A_Y", $acad_year);
+                                                if (oci_execute($sql)) {
+                                                    echo "<script> Swal.fire({
+                                                        title: 'RECORD SAVED SUCCESSFULLY',
+                                                        icon: 'success',
+                                                        showConfirmButton: true
+                                                    });</script>";
+                                                } else {
+                                                    echo "<script> Swal.fire({
+                                                        title: 'ERROR SAVING RECORD',
+                                                        icon: 'error',
+                                                        showConfirmButton: true
+                                                    });</script>";
+                                                }
+                                            }
+                                        }
                                     }
                                 } else {
                                     echo "<script> Swal.fire({
-                                                title: 'SELECT CUSTOMER CREDIT RATING',
-                                                icon: 'warning',
+                                                    title: 'ERROR SAVING RECORD',
+                                                    icon: 'error',
+                                                    showConfirmButton: true
+                                                });</script>";
+                                }
+                            } else {
+                                $sql = oci_parse($conn, "INSERT INTO STUDENT_EVALUATION (S_ID,SUB_CODE,STUD_ID,EMP_ID,ACADEMIC_YEAR,TERM,CONST_ASS,EXAM,ENTRY_DT,CLASS_CODE,MARK_STATUS) 
+                                     VALUES (:S_ID,:SUB_CODE,:ID,:EMP_ID,:A_Y,:TERM,:CA,:EXAM,SYSDATE,:CLASS_CODE,'ACCEPTED')");
+                                oci_bind_by_name($sql, ":ID", $id);
+                                oci_bind_by_name($sql, ":S_ID", $sid);
+                                oci_bind_by_name($sql, ":TERM", $_POST['select_term']);
+                                oci_bind_by_name($sql, ":A_Y", $acad_year);
+                                oci_bind_by_name($sql, ":EMP_ID", $emp_id);
+                                oci_bind_by_name($sql, ":CA", $ca);
+                                oci_bind_by_name($sql, ":EXAM", $exam);
+                                oci_bind_by_name($sql, ":CLASS_CODE", $_POST['select_class']);
+                                oci_bind_by_name($sql, ":SUB_CODE", $_POST['select_subject']);
+                                if (oci_execute($sql)) {
+                                    $getgrade = oci_parse($conn, "SELECT * FROM GRADE A JOIN GRADE_SETTING B ON A.G_CODE = B.G_CODE WHERE B.START_GRADE_RANGE <= CAST($total AS INT) AND CAST($total AS INT) <= B.END_GRADE_RANGE  ORDER BY A.GRADE");
+                                    oci_execute($getgrade);
+
+                                    while ($b = oci_fetch_array($getgrade)) {
+                                        $g_code = $b["G_CODE"];
+                                        $grade = $b["GRADE"];
+                                    }
+                                    $sql = oci_parse($conn, "INSERT INTO STUDENT_CUMULATIVE(S_ID,SUB_CODE,G_CODE,SUBJ_CODE,ACADEMIC_YEAR,TERM,STUD_ID,MARK,ENTRY_DT) VALUES (:S_ID,:CLASS_CODE,:G_CODE,:SUB_CODE,:A_Y,:TERM,:STUD_ID,:MARK,SYSDATE)");
+                                    oci_bind_by_name($sql, ":CLASS_CODE", $_POST['select_class']);
+                                    oci_bind_by_name($sql, ":STUD_ID", $id);
+                                    oci_bind_by_name($sql, ":SUB_CODE", $_POST['select_subject']);
+                                    oci_bind_by_name($sql, ":TERM", $_POST['select_term']);
+                                    oci_bind_by_name($sql, ":A_Y", $acad_year);
+                                    oci_bind_by_name($sql, ":MARK", $total);
+                                    oci_bind_by_name($sql, ":G_CODE", $g_code);
+                                    oci_bind_by_name($sql, ":S_ID", $sid);
+                                    if (oci_execute($sql)) {
+                                        $sql = oci_parse($conn, "SELECT * FROM STUDENT_STANDINGS WHERE TERM = :TERM AND STUD_ID = :ID AND CLASS_CODE =:CLASS_CODE");
+                                        oci_bind_by_name($sql, ":ID", $id);
+                                        oci_bind_by_name($sql, ":TERM", $_POST['select_term']);
+                                        oci_bind_by_name($sql, ":CLASS_CODE", $_POST['select_class']);
+
+                                        oci_execute($sql);
+                                        if (oci_fetch_all($sql, $a) > 0) {
+                                            $sql = oci_parse($conn, "SELECT ROUND(AVG(MARK),2) AS AVERAGE FROM STUDENT_CUMULATIVE WHERE TERM = :TERM AND STUD_ID = :ID AND SUB_CODE =:CLASS_CODE ");
+                                            oci_bind_by_name($sql, ":ID", $id);
+                                            oci_bind_by_name($sql, ":TERM", $_POST['select_term']);
+                                            oci_bind_by_name($sql, ":CLASS_CODE", $_POST['select_class']);
+                                            oci_execute($sql);
+                                            while ($get = oci_fetch_array($sql)) {
+                                                $avg = $get['AVERAGE'];
+                                            }
+                                            $getgrade = oci_parse($conn, "SELECT * FROM GRADE A JOIN GRADE_SETTING B ON A.G_CODE = B.G_CODE WHERE B.START_GRADE_RANGE <= CAST($avg AS INT) AND CAST($avg AS INT) <= B.END_GRADE_RANGE  ORDER BY A.GRADE");
+                                            oci_execute($getgrade);
+
+                                            while ($b = oci_fetch_array($getgrade)) {
+                                                $g_code = $b["G_CODE"];
+                                                $grade = $b["GRADE"];
+                                            }
+
+                                            $sql = oci_parse($conn, "SELECT * FROM GPA WHERE G_CODE = :G_CODE");
+                                            oci_bind_by_name($sql, ":G_CODE", $g_code);
+                                            oci_execute($sql);
+                                            while ($get = oci_fetch_array($sql)) {
+                                                $gpa = $get['GPA'];
+                                            }
+
+                                            $sql = oci_parse($conn, "UPDATE STUDENT_STANDINGS SET GPA = :GPA , AVERAGE=:AVERAGE WHERE STUD_ID=:ID AND TERM =:TERM AND CLASS_CODE =:CLASS_CODE ");
+                                            oci_bind_by_name($sql, ":GPA", $gpa);
+                                            oci_bind_by_name($sql, ":AVERAGE", $avg);
+                                            oci_bind_by_name($sql, ":CLASS_CODE", $_POST['select_class']);
+                                            oci_bind_by_name($sql, ":ID", $id);
+                                            oci_bind_by_name($sql, ":TERM", $_POST['select_term']);
+                                            if (oci_execute($sql)) {
+                                                echo "<script> Swal.fire({
+                                                            title: 'RECORD SAVED SUCCESSFULLY',
+                                                            icon: 'success',
+                                                            showConfirmButton: true
+                                                        });</script>";
+                                            } else {
+                                                echo "<script> Swal.fire({
+                                                            title: 'ERROR SAVING RECORD',
+                                                            icon: 'error',
+                                                            showConfirmButton: true
+                                                        });</script>";
+                                            }
+                                        } else {
+                                            $sql = oci_parse($conn, "SELECT ROUND(AVG(MARK),2) AS AVERAGE FROM STUDENT_CUMULATIVE WHERE TERM = :TERM AND STUD_ID = :ID AND SUB_CODE =:CLASS_CODE");
+                                            oci_bind_by_name($sql, ":ID", $id);
+                                            oci_bind_by_name($sql, ":TERM", $_POST['select_term']);
+                                            oci_bind_by_name($sql, ":CLASS_CODE", $_POST['select_class']);
+                                            oci_execute($sql);
+                                            while ($get = oci_fetch_array($sql)) {
+                                                $avg = $get['AVERAGE'];
+                                            }
+                                            $getgrade = oci_parse($conn, "SELECT * FROM GRADE A JOIN GRADE_SETTING B ON A.G_CODE = B.G_CODE WHERE B.START_GRADE_RANGE <= CAST($avg AS INT) AND CAST($avg AS INT) <= B.END_GRADE_RANGE  ORDER BY A.GRADE");
+                                            oci_execute($getgrade);
+
+                                            while ($b = oci_fetch_array($getgrade)) {
+                                                $g_code = $b["G_CODE"];
+                                                $grade = $b["GRADE"];
+                                            }
+
+                                            $sql = oci_parse($conn, "SELECT * FROM GPA WHERE G_CODE = :G_CODE");
+                                            oci_bind_by_name($sql, ":G_CODE", $g_code);
+                                            oci_execute($sql);
+                                            while ($get = oci_fetch_array($sql)) {
+                                                $gpa = $get['GPA'];
+                                            }
+
+                                            $sql = oci_parse($conn, "INSERT INTO STUDENT_STANDINGS (CLASS_CODE,GPA,AVERAGE,STUD_ID,TERM,ACADEMIC_YEAR,S_ID,STATUS) VALUES (:CLASS_CODE,:GPA,:AVERAGE,:ID,:TERM,:A_Y,:S_ID,'COMPILED')");
+                                            oci_bind_by_name($sql, ":GPA", $gpa);
+                                            oci_bind_by_name($sql, ":AVERAGE", $avg);
+                                            oci_bind_by_name($sql, ":CLASS_CODE", $_POST['select_class']);
+                                            oci_bind_by_name($sql, ":ID", $id);
+                                            oci_bind_by_name($sql, ":S_ID", $sid);
+                                            oci_bind_by_name($sql, ":TERM", $_POST['select_term']);
+                                            oci_bind_by_name($sql, ":A_Y", $acad_year);
+                                            if (oci_execute($sql)) {
+                                                echo "<script> Swal.fire({
+                                                            title: 'RECORD SAVED SUCCESSFULLY',
+                                                            icon: 'success',
+                                                            showConfirmButton: true
+                                                        });</script>";
+                                            } else {
+                                                echo "<script> Swal.fire({
+                                                            title: 'ERROR SAVING RECORD',
+                                                            icon: 'error',
+                                                            showConfirmButton: true
+                                                        });</script>";
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    echo "<script> Swal.fire({
+                                                title: 'ERROR SAVING RECORD',
+                                                icon: 'error',
                                                 showConfirmButton: true
                                             });</script>";
                                 }
                             }
                         } else {
                             echo "<script> Swal.fire({
-                                                title: 'ENTER CUSTOMER SECONDARY NUMBER',
-                                                icon: 'warning',
-                                                showConfirmButton: true
-                                            });</script>";
+                                                    title: 'ENTER MARK',
+                                                    icon: 'warning',
+                                                    showConfirmButton: true
+                                                });</script>";
                         }
                     } else {
                         echo "<script> Swal.fire({
-                                            title: 'ENTER CUSTOMER PRIMARY NUMBER',
+                                            title: 'SELECT SUBJECT',
                                             icon: 'warning',
                                             showConfirmButton: true
                                         });</script>";
                     }
-                }else {
+                } else {
                     echo "<script> Swal.fire({
-                        title: 'SELECT TOWN',
-                        icon: 'warning',
-                        showConfirmButton: true
-                    });</script>";
+                                title: 'SELECT CLASS',
+                                icon: 'warning',
+                                showConfirmButton: true
+                            });</script>";
                 }
-              
             } else {
                 echo "<script> Swal.fire({
-                            title: 'ENTER CUSTOMER ADDRESS',
+                            title: 'SELECT TERM',
                             icon: 'warning',
                             showConfirmButton: true
                         });</script>";
             }
         } else {
             echo "<script> Swal.fire({
-                    title: 'ENTER CUSTOMER NAME',
+                    title: 'SELECT STUDENT',
                     icon: 'warning',
                     showConfirmButton: true
                 });</script>";
         }
     }
 
-
-    if (isset($_POST['edit_btn'])) {
-        if (isset($_POST['select_customer'])) {
-            if (isset($_POST['field'])) {
-                if ($_POST['field'] == 'TYPE') {
-                    if (isset($_POST['edit_select_cust_type'])) {
-                        $sql = oci_parse($conn, "UPDATE CUSTOMER SET TYPE_ID=:TYPE_ID WHERE CUST_ID=:CUST_ID");
-                        oci_bind_by_name($sql, ":TYPE_ID", $_POST['edit_select_cust_type']);
-                        oci_bind_by_name($sql, ":CUST_ID", strtoupper($_POST['select_customer']));
-                        if (oci_execute($sql)) {
-                            echo "<script> Swal.fire({
-                                title: 'CUSTOMER TYPE EDITED SUCCESSFULLY',
-                                icon: 'success',
-                                showConfirmButton: true
-                            });</script>";
-                            header("refresh:2;");
-                        } else {
-                            echo "<script> Swal.fire({
-                                title: 'ERROR UPDATING CUSTOMER TYPE',
-                                icon: 'error',
-                                showConfirmButton: true
-                            });</script>";
-                        }
-                    } else {
-                        echo "<script> Swal.fire({
-                            title: 'SELECT CUSTOMER TYPE',
-                            icon: 'warning',
-                            showConfirmButton: true
-                        });</script>";
-                    }
-                } else
-                    if ($_POST['field'] == 'NAME') {
-                    if ($_POST['edit_c_name']) {
-                        $sql = oci_parse($conn, "UPDATE CUSTOMER SET NAME=:NAME WHERE CUST_ID=:CUST_ID");
-                        oci_bind_by_name($sql, ":NAME", strtoupper($_POST['edit_c_name']));
-                        oci_bind_by_name($sql, ":CUST_ID", strtoupper($_POST['select_customer']));
-                        if (oci_execute($sql)) {
-                            echo "<script> Swal.fire({
-                                    title: 'CUSTOMER NAME EDITED SUCCESSFULLY',
-                                    icon: 'success',
-                                    showConfirmButton: true
-                                });</script>";
-                            header("refresh:2;");
-                        } else {
-                            echo "<script> Swal.fire({
-                                    title: 'ERROR UPDATING CUSTOMER NAME',
-                                    icon: 'error',
-                                    showConfirmButton: true
-                                });</script>";
-                        }
-                    } else {
-                        echo "<script> Swal.fire({
-                                title: 'ENTER CUSTOMER FIRST NAME',
-                                icon: 'warning',
-                                showConfirmButton: true
-                            });</script>";
-                    }
-                } else
-                    if ($_POST['field'] == 'ADDRESS') {
-                    if ($_POST['edit_c_address']) {
-                        $sql = oci_parse($conn, "UPDATE CUSTOMER SET ADDRESS=:NAME WHERE CUST_ID=:CUST_ID");
-                        oci_bind_by_name($sql, ":NAME", strtoupper($_POST['edit_c_address']));
-                        oci_bind_by_name($sql, ":CUST_ID", strtoupper($_POST['select_customer']));
-                        if (oci_execute($sql)) {
-                            echo "<script> Swal.fire({
-                                    title: 'CUSTOMER ADDRESS EDITED SUCCESSFULLY',
-                                    icon: 'success',
-                                    showConfirmButton: true
-                                });</script>";
-                            header("refresh:2;");
-                        } else {
-                            echo "<script> Swal.fire({
-                                    title: 'ERROR UPDATING CUSTOMER ADDRESS',
-                                    icon: 'error',
-                                    showConfirmButton: true
-                                });</script>";
-                        }
-                    } else {
-                        echo "<script> Swal.fire({
-                                title: 'ENTER CUSTOMER ADDRESS',
-                                icon: 'warning',
-                                showConfirmButton: true
-                            });</script>";
-                    }
-                } else
-                    if ($_POST['field'] == 'ADDRESS') {
-                    if ($_POST['edit_c_address']) {
-                        $sql = oci_parse($conn, "UPDATE CUSTOMER SET ADDRESS=:NAME WHERE CUST_ID=:CUST_ID");
-                        oci_bind_by_name($sql, ":NAME", strtoupper($_POST['edit_c_address']));
-                        oci_bind_by_name($sql, ":CUST_ID", strtoupper($_POST['select_customer']));
-                        if (oci_execute($sql)) {
-                            echo "<script> Swal.fire({
-                                    title: 'CUSTOMER ADDRESS EDITED SUCCESSFULLY',
-                                    icon: 'success',
-                                    showConfirmButton: true
-                                });</script>";
-                            header("refresh:2;");
-                        } else {
-                            echo "<script> Swal.fire({
-                                    title: 'ERROR UPDATING CUSTOMER ADDRESS',
-                                    icon: 'error',
-                                    showConfirmButton: true
-                                });</script>";
-                        }
-                    } else {
-                        echo "<script> Swal.fire({
-                                title: 'ENTER CUSTOMER ADDRESS',
-                                icon: 'warning',
-                                showConfirmButton: true
-                            });</script>";
-                    }
-                } else
-                if ($_POST['field'] == 'PRIMARY LINE') {
-                    if ($_POST['edit_c_pri_no']) {
-                        $sql = oci_parse($conn, "UPDATE CUSTOMER SET PRIMARY_LINE=:NAME WHERE CUST_ID=:CUST_ID");
-                        oci_bind_by_name($sql, ":NAME", strtoupper($_POST['edit_c_pri_no']));
-                        oci_bind_by_name($sql, ":CUST_ID", strtoupper($_POST['select_customer']));
-                        if (oci_execute($sql)) {
-                            echo "<script> Swal.fire({
-                                title: 'CUSTOMER PRIMARY LINE EDITED SUCCESSFULLY',
-                                icon: 'success',
-                                showConfirmButton: true
-                            });</script>";
-                            header("refresh:2;");
-                        } else {
-                            echo "<script> Swal.fire({
-                                title: 'ERROR UPDATING CUSTOMER PRIMARY LINE',
-                                icon: 'error',
-                                showConfirmButton: true
-                            });</script>";
-                        }
-                    } else {
-                        echo "<script> Swal.fire({
-                            title: 'ENTER CUSTOMER PRIMARY LINE',
-                            icon: 'warning',
-                            showConfirmButton: true
-                        });</script>";
-                    }
-                } else
-                if ($_POST['field'] == 'SECONDARY LINE') {
-                    if ($_POST['edit_c_sec_no']) {
-                        $sql = oci_parse($conn, "UPDATE CUSTOMER SET SECONDARY_LINE=:NAME WHERE CUST_ID=:CUST_ID");
-                        oci_bind_by_name($sql, ":NAME", strtoupper($_POST['edit_c_sec_no']));
-                        oci_bind_by_name($sql, ":CUST_ID", strtoupper($_POST['select_customer']));
-                        if (oci_execute($sql)) {
-                            echo "<script> Swal.fire({
-                                title: 'CUSTOMER SECONDARY LINE EDITED SUCCESSFULLY',
-                                icon: 'success',
-                                showConfirmButton: true
-                            });</script>";
-                            header("refresh:2;");
-                        } else {
-                            echo "<script> Swal.fire({
-                                title: 'ERROR UPDATING CUSTOMER SECONDARY LINE',
-                                icon: 'error',
-                                showConfirmButton: true
-                            });</script>";
-                        }
-                    } else {
-                        echo "<script> Swal.fire({
-                            title: 'ENTER CUSTOMER SECONDARY LINE',
-                            icon: 'warning',
-                            showConfirmButton: true
-                        });</script>";
-                    }
-                } else
-                if ($_POST['field'] == 'EMAIL') {
-                    if ($_POST['edit_c_email']) {
-                        $sql = oci_parse($conn, "UPDATE CUSTOMER SET EMAIL=:NAME WHERE CUST_ID=:CUST_ID");
-                        oci_bind_by_name($sql, ":NAME", strtoupper($_POST['edit_c_email']));
-                        oci_bind_by_name($sql, ":CUST_ID", strtoupper($_POST['select_customer']));
-                        if (oci_execute($sql)) {
-                            echo "<script> Swal.fire({
-                                title: 'CUSTOMER EMAIL EDITED SUCCESSFULLY',
-                                icon: 'success',
-                                showConfirmButton: true
-                            });</script>";
-                            header("refresh:2;");
-                        } else {
-                            echo "<script> Swal.fire({
-                                title: 'ERROR UPDATING CUSTOMER EMAIL',
-                                icon: 'error',
-                                showConfirmButton: true
-                            });</script>";
-                        }
-                    } else {
-                        echo "<script> Swal.fire({
-                            title: 'ENTER CUSTOMER EMAIL',
-                            icon: 'warning',
-                            showConfirmButton: true
-                        });</script>";
-                    }
-                } else
-                if ($_POST['field'] == 'VAT/TIN NUMBER') {
-                    if ($_POST['edit_c_vat_tin_no']) {
-                        $sql = oci_parse($conn, "UPDATE CUSTOMER SET VAT_TIN_NO=:NAME WHERE CUST_ID=:CUST_ID");
-                        oci_bind_by_name($sql, ":NAME", strtoupper($_POST['edit_c_vat_tin_no']));
-                        oci_bind_by_name($sql, ":CUST_ID", strtoupper($_POST['select_customer']));
-                        if (oci_execute($sql)) {
-                            echo "<script> Swal.fire({
-                                title: 'CUSTOMER VAT/TIN NUMBER EDITED SUCCESSFULLY',
-                                icon: 'success',
-                                showConfirmButton: true
-                            });</script>";
-                            header("refresh:2;");
-                        } else {
-                            echo "<script> Swal.fire({
-                                title: 'ERROR UPDATING CUSTOMER EMAIL',
-                                icon: 'error',
-                                showConfirmButton: true
-                            });</script>";
-                        }
-                    } else {
-                        echo "<script> Swal.fire({
-                            title: 'ENTER CUSTOMER EMAIL',
-                            icon: 'warning',
-                            showConfirmButton: true
-                        });</script>";
-                    }
-                } else
-                if ($_POST['field'] == 'ID NUMBER') {
-                    if ($_POST['edit_c_id_no']) {
-                        $sql = oci_parse($conn, "UPDATE CUSTOMER SET ID_NO=:NAME WHERE CUST_ID=:CUST_ID");
-                        oci_bind_by_name($sql, ":NAME", strtoupper($_POST['edit_c_id_no']));
-                        oci_bind_by_name($sql, ":CUST_ID", strtoupper($_POST['select_customer']));
-                        if (oci_execute($sql)) {
-                            echo "<script> Swal.fire({
-                                title: 'CUSTOMER ID NUMBER EDITED SUCCESSFULLY',
-                                icon: 'success',
-                                showConfirmButton: true
-                            });</script>";
-                            header("refresh:2;");
-                        } else {
-                            echo "<script> Swal.fire({
-                                title: 'ERROR UPDATING CUSTOMER ID NUMBER',
-                                icon: 'error',
-                                showConfirmButton: true
-                            });</script>";
-                        }
-                    } else {
-                        echo "<script> Swal.fire({
-                            title: 'ENTER CUSTOMER ID NUMBER',
-                            icon: 'warning',
-                            showConfirmButton: true
-                        });</script>";
-                    }
-                } else
-                if ($_POST['field'] == 'CREDIT RATING') {
-                    if ($_POST['edit_select_customer_rating']) {
-                        $sql = oci_parse($conn, "UPDATE CUSTOMER SET RATING_CODE=:NAME WHERE CUST_ID=:CUST_ID");
-                        oci_bind_by_name($sql, ":NAME", strtoupper($_POST['edit_select_customer_rating']));
-                        oci_bind_by_name($sql, ":CUST_ID", strtoupper($_POST['select_customer']));
-                        if (oci_execute($sql)) {
-                            echo "<script> Swal.fire({
-                                title: 'CUSTOMER CREDIT RATING EDITED SUCCESSFULLY',
-                                icon: 'success',
-                                showConfirmButton: true
-                            });</script>";
-                            header("refresh:2;");
-                        } else {
-                            echo "<script> Swal.fire({
-                                title: 'ERROR UPDATING CUSTOMER CREDIT RATING',
-                                icon: 'error',
-                                showConfirmButton: true
-                            });</script>";
-                        }
-                    } else {
-                        echo "<script> Swal.fire({
-                            title: 'ENTER CUSTOMER CREDIT RATING',
-                            icon: 'warning',
-                            showConfirmButton: true
-                        });</script>";
-                    }
-                }
-                else
-                if ($_POST['field'] == 'TOWN') {
-                    if ($_POST['edit_select_town']) {
-                        $sql = oci_parse($conn, "UPDATE CUSTOMER SET TOWN_CODE=:NAME WHERE CUST_ID=:CUST_ID");
-                        oci_bind_by_name($sql, ":NAME", strtoupper($_POST['edit_select_town']));
-                        oci_bind_by_name($sql, ":CUST_ID", strtoupper($_POST['select_customer']));
-                        if (oci_execute($sql)) {
-                            echo "<script> Swal.fire({
-                                title: 'CUSTOMER TOWN EDITED SUCCESSFULLY',
-                                icon: 'success',
-                                showConfirmButton: true
-                            });</script>";
-                            header("refresh:2;");
-                        } else {
-                            echo "<script> Swal.fire({
-                                title: 'ERROR UPDATING CUSTOMER TOWN',
-                                icon: 'error',
-                                showConfirmButton: true
-                            });</script>";
-                        }
-                    } else {
-                        echo "<script> Swal.fire({
-                            title: 'ENTER TOWN',
-                            icon: 'warning',
-                            showConfirmButton: true
-                        });</script>";
-                    }
-                }
-            } else {
-                echo "<script> Swal.fire({
-                    title: 'SELECT FIELD',
-                    icon: 'warning',
-                    showConfirmButton: true
-                });</script>";
-            }
-        } else {
-            echo "<script> Swal.fire({
-                title: 'SELECT CUSTOMER',
-                icon: 'warning',
-                showConfirmButton: true
-            });</script>";
-        }
-    }
     function isjpeg_png($file)
     {
         $type = [IMAGETYPE_JPEG, IMAGETYPE_PNG];

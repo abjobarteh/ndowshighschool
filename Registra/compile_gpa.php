@@ -167,17 +167,26 @@ include('auto_logout.php');
                         if ($cnt < 8) {
                             continue;
                         }
-                        $SQL = oci_parse($conn, "SELECT ROUND(SUM(TOTAL_GPA_CREDIT) / SUM(CREDIT_HRS), 2) AS GPA FROM STUDENT_CUMULATIVE WHERE STUD_ID = '$stud_id' AND TERM = '$t' AND SUB_CODE = $s_code");
-                        oci_execute($SQL);
-                        while ($row = oci_fetch_array($SQL)) {
-                            $gpa = $row["GPA"];
-                            //  echo $gpa;
-                        }
+                      
                         $SQL = oci_parse($conn, "SELECT ROUND(AVG(MARK),1) AS AVERAGE FROM STUDENT_CUMULATIVE WHERE STUD_ID = '$stud_id' AND TERM = '$t' AND SUB_CODE = $s_code");
                         oci_execute($SQL);
                         while ($row = oci_fetch_array($SQL)) {
                             $avg = $row["AVERAGE"];
                             //  echo $gpa;
+                        }
+                        $getgrade = oci_parse($conn, "SELECT * FROM GRADE A JOIN GRADE_SETTING B ON A.G_CODE = B.G_CODE WHERE B.START_GRADE_RANGE <= CAST($avg AS INT) AND CAST($avg AS INT) <= B.END_GRADE_RANGE  ORDER BY A.GRADE");
+                        oci_execute($getgrade);
+
+                        while ($b = oci_fetch_array($getgrade)) {
+                            $g_code = $b["G_CODE"];
+                            $grade = $b["GRADE"];
+                        }
+
+                        $sql = oci_parse($conn, "SELECT * FROM GPA WHERE G_CODE = :G_CODE");
+                        oci_bind_by_name($sql, ":G_CODE", $g_code);
+                        oci_execute($sql);
+                        while ($get = oci_fetch_array($sql)) {
+                            $gpa = $get['GPA'];
                         }
                         $sql = oci_parse($conn, "INSERT INTO STUDENT_STANDINGS (S_ID,GPA,CLASS_CODE,ACADEMIC_YEAR,TERM,STUD_ID,STATUS,AVERAGE) VALUES ($sid,$gpa,$s_code,'$a_y','$t','$stud_id','COMPILED','$avg')
                         ");

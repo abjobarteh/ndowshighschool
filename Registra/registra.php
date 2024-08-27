@@ -173,6 +173,21 @@ $sid = $_SESSION['sid'];
                         <li class="item">
                             <a href="assign_student.php">Enroll Student</a>
                         </li>
+                    </ul>
+                </li>
+
+
+                <li class="item">
+                    <div class="submenu-item">
+                        <span>Student Grade Management</span>
+                        <span class="fas fa-caret-down first"></span>
+                    </div>
+
+                    <ul class="menu-items submenu">
+                        <div class="menu-title">
+                            <span class="fas fa-caret-down first"></span>
+                            Student Grade Management
+                        </div>
                         <li class="item">
                             <a href="report.php">Generate Mass Student Term Report Card</a>
                         </li>
@@ -183,7 +198,7 @@ $sid = $_SESSION['sid'];
                             <a href="select_class_report.php">Generate Student Term Report Card</a>
                         </li>
                         <li class="item">
-                            <a href="transcript">Generate Student Term Report/Transcript</a>
+                            <a href="transcript">Transcript</a>
                         </li>
                         <li class="item">
                             <a href="Marks.php">Generate Report For Missing Marks</a>

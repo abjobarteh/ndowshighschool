@@ -207,7 +207,7 @@ include('auto_logout.php');
                                 }
                             }
                             // Generate PDF from receipt data (Assuming the receipt is already in PDF format)
-                            $pdfPath = $directory . 'receipt_' . $row['INVOICE_NO'] . '.pdf';
+                            $pdfPath = $directory . 'receipt_' . $row['INVOICE_NO'] . '.jpg';
                             file_put_contents($pdfPath, $receiptData);
 
                         ?>
@@ -499,9 +499,9 @@ include('auto_logout.php');
         require '../vendor/autoload.php';
 
 
-        require 'C:\wamp64\www\Academix\NDOWS\Registra\PHPMailer.php';
-        require 'C:\wamp64\www\Academix\NDOWS\Registra\Exception.php';
-        require 'C:\wamp64\www\Academix\NDOWS\Registra\SMTP.php';
+        require 'D:\Junior\Registra\PHPMailer.php';
+        require 'D:\Junior\Registra\Exception.php';
+        require 'D:\Junior\Registra\SMTP.php';
 
         use PhpOffice\PhpSpreadsheet\Spreadsheet;
         use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
@@ -549,7 +549,7 @@ include('auto_logout.php');
                             $sheet->setCellValue('A' . $row, $row_data['INVOICE_NO']);
                             $sheet->setCellValue('B' . $row, $row_data['DESCRIPTION']);
                             $sheet->setCellValue('C' . $row, $row_data['REF_NO']);
-                            $sheet->setCellValue('D' . $row, $row_data['AMOUNT']);
+                            $sheet->setCellValue('D' . $row, $row_data['AMT']);
                             $sheet->setCellValue('E' . $row, $row_data['NAME']);
                             $sheet->setCellValue('F' . $row, $row_data['CLASS_NAME']);
                             $sheet->setCellValue('G' . $row, $row_data['POSTED_DT']);
@@ -610,7 +610,7 @@ include('auto_logout.php');
                                     $sheet->setCellValue('A' . $row, $row_data['INVOICE_NO']);
                                     $sheet->setCellValue('B' . $row, $row_data['DESCRIPTION']);
                                     $sheet->setCellValue('C' . $row, $row_data['REF_NO']);
-                                    $sheet->setCellValue('D' . $row, $row_data['AMOUNT']);
+                                    $sheet->setCellValue('D' . $row, $row_data['AMT']);
                                     $sheet->setCellValue('E' . $row, $row_data['NAME']);
                                     $sheet->setCellValue('F' . $row, $row_data['CLASS_NAME']);
                                     $sheet->setCellValue('G' . $row, $row_data['POSTED_DT']);

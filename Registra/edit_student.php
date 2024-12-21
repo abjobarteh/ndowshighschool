@@ -168,7 +168,7 @@ $user = $_SESSION['username'];
                  display:flex;
                  margin-left:10px;
                 animation:button .3s linear;text-align: center;">
-                    <?php  echo '<script>
+                    <?php echo '<script>
 															Swal.fire({
 																position: "center",
 																icon: "warning",
@@ -240,7 +240,7 @@ $user = $_SESSION['username'];
                              display:flex;
                              margin-left:10px;
                             animation:button .3s linear;text-align: center;">
-                    <?php  echo '<script>
+                    <?php echo '<script>
 															Swal.fire({
 																position: "center",
 																icon: "warning",
@@ -646,7 +646,7 @@ $user = $_SESSION['username'];
                     <option disabled selected>Select Student </option>
                     <?php
 
-                    $get_hos = "select * from student a join student_academic b on (a.stud_id=b.stud_id) where a.s_id = $sid and a.status != 'GRADUATED' and a.name != 'ABUBACARR JOBARTEH' and b.sub_code = $sub_cd  order by name ";
+                    $get_hos = "select * from student a join class_student b on (a.stud_id=b.stud_id) where a.s_id = $sid and a.status != 'GRADUATED' and a.name != 'ABUBACARR JOBARTEH' and b.sub_code = $sub_cd  order by name ";
                     $get = oci_parse(oci_connect($username, $password, $connection), $get_hos);
                     oci_execute($get);
                     while ($row = oci_fetch_array($get)) {
@@ -3106,103 +3106,108 @@ $user = $_SESSION['username'];
                                 ?>
 
         </div>
-    
-                <?php
-                if (isset($_POST['add_mark'])) {
-                    $stuid = $_SESSION['STID'];
-                    $sql = oci_parse($conn, "SELECT * FROM CLASS_STUDENT WHERE STUD_ID = '$stuid' ");
-                    oci_execute($sql);
-                    while ($row = oci_fetch_array($sql)) {
-                        $class_code = $row['SUB_CODE'];
-                    }
-                    if (isset($_POST['add_stud_term'])) {
-                        $t = $_POST['add_stud_term'];
-                        if (isset($_POST['add_stud_subject'])) {
-                            $sub_code = $_POST['add_stud_subject'];
-                            $cass = $_POST['add_cas'];
-                            if ($cass != '') {
-                                $exam = $_POST['add_exam'];
-                                  if($exam != ''){
-                                 //    $sql = "SELECT * FROM STUDENT_EVALUATION WHERE TERM = '$t' AND CLASS_CODE = $class_code AND SUB_CODE = $sub_code and stud_id = '$stuid' ";
-                                      $sql = oci_parse($conn,"SELECT * FROM STUDENT_EVALUATION WHERE TERM = '$t' AND CLASS_CODE = $class_code AND SUB_CODE = $sub_code and stud_id = '$stuid' ");
-                                      oci_execute($sql);
-                                      if(oci_fetch_all($sql,$a)==0){
-                                        $cas_mark = 0.3*$cass;
-                                        $exam_mark = 0.7*$exam;
-                                        $emp_id = '202403291125';
-                                    /*    echo "INSERT INTO STUDENT_EVALUATION (S_ID,SUB_CODE,STUD_ID,EMP_ID,ACADEMIC_YEAR,TERM,CONST_ASS,EXAM,ENTRY_DT,CLASS_CODE,MARK_STATUS)
+
+        <?php
+        if (isset($_POST['add_mark'])) {
+            $stuid = $_SESSION['STID'];
+            $sql = oci_parse($conn, "SELECT * FROM CLASS_STUDENT WHERE STUD_ID = '$stuid' ");
+            oci_execute($sql);
+            while ($row = oci_fetch_array($sql)) {
+                $class_code = $row['SUB_CODE'];
+            }
+            if (isset($_POST['add_stud_term'])) {
+                $t = $_POST['add_stud_term'];
+                $getyear = oci_parse($conn, "SELECT * FROM TERM_CALENDAR WHERE TERM = '$t' ");
+                oci_execute($getyear);
+                while ($row = oci_fetch_array($getyear)) {
+                    $a_y = $row['ACADEMIC_YEAR'];
+                }
+                if (isset($_POST['add_stud_subject'])) {
+                    $sub_code = $_POST['add_stud_subject'];
+                    $cass = $_POST['add_cas'];
+                    if ($cass != '') {
+                        $exam = $_POST['add_exam'];
+                        if ($exam != '') {
+                            //    $sql = "SELECT * FROM STUDENT_EVALUATION WHERE TERM = '$t' AND CLASS_CODE = $class_code AND SUB_CODE = $sub_code and stud_id = '$stuid' ";
+                            $sql = oci_parse($conn, "SELECT * FROM STUDENT_EVALUATION WHERE TERM = '$t' AND CLASS_CODE = $class_code AND SUB_CODE = $sub_code and stud_id = '$stuid' ");
+                            oci_execute($sql);
+                            if (oci_fetch_all($sql, $a) == 0) {
+                                $cas_mark = 0.3 * $cass;
+                                $exam_mark = 0.7 * $exam;
+                                $emp_id = '202403291125';
+                                /*    echo "INSERT INTO STUDENT_EVALUATION (S_ID,SUB_CODE,STUD_ID,EMP_ID,ACADEMIC_YEAR,TERM,CONST_ASS,EXAM,ENTRY_DT,CLASS_CODE,MARK_STATUS)
                                         VALUES  ($sid,$sub_code,' $stuid','$emp_id','$a_y','$t',$cas_mark,$exam_mark,sysdate,$class_code,'ACCEPTED')";
                                         */
-                                        $sql = oci_parse($conn, "INSERT INTO STUDENT_EVALUATION (S_ID,SUB_CODE,STUD_ID,EMP_ID,ACADEMIC_YEAR,TERM,CONST_ASS,EXAM,ENTRY_DT,CLASS_CODE,MARK_STATUS)
+                                $sql = oci_parse($conn, "INSERT INTO STUDENT_EVALUATION (S_ID,SUB_CODE,STUD_ID,EMP_ID,ACADEMIC_YEAR,TERM,CONST_ASS,EXAM,ENTRY_DT,CLASS_CODE,MARK_STATUS)
                                         VALUES  ($sid,$sub_code,'$stuid','$emp_id','$a_y','$t',$cas_mark,$exam_mark,sysdate,$class_code,'ACCEPTED')");
-                                        
-                                        
-                                        
 
-                                        if(oci_execute($sql)){
-                                            $stud_id = $stuid;
-                                        $s_code = $class_code;
-                                        // Fetch total marks for the student
-                                        $gettotal = "SELECT * FROM STUDENT A JOIN STUDENT_EVALUATION B ON (A.STUD_ID=B.STUD_ID) WHERE B.S_ID = $sid AND MARK_STATUS = 'ACCEPTED' and B.CLASS_CODE = $class_code AND B.SUB_CODE = $sub_code AND B.EMP_ID = '$emp_id' AND B.STUD_ID = '$stud_id' and b.term = '$t' ";
-                                        $s = oci_parse($conn, $gettotal);
-                                        oci_execute($s);
-                
-                                        while ($a = oci_fetch_array($s)) {
-                                            $total = $a["CONST_ASS"] + $a["EXAM"];
-                                        }
-                
-                                        // Fetch grade information based on total marks
-                                        $getgrade = oci_parse($conn, "SELECT * FROM GRADE A JOIN GRADE_SETTING B ON A.G_CODE = B.G_CODE WHERE B.START_GRADE_RANGE <= CAST($total AS INT) AND CAST($total AS INT) <= B.END_GRADE_RANGE AND B.S_ID  = $sid ORDER BY A.GRADE");
-                                        oci_execute($getgrade);
-                
-                                        while ($b = oci_fetch_array($getgrade)) {
-                                            $g_code = $b["G_CODE"];
-                                            $grade = $b["GRADE"];
-                                        }
-                
-                                        // Fetch GPA based on grade
-                                        $getgpa = oci_parse($conn, "SELECT * FROM GPA WHERE g_code = $g_code");
-                                        oci_execute($getgpa);
-                
-                                        while ($c = oci_fetch_array($getgpa)) {
-                                            $gpa = $c['GPA'];
-                                        }
-                
-                                        // Fetch subject credit hours
-                                        $getgpa = oci_parse($conn, "SELECT * FROM SUBJECT WHERE SUB_CODE = $sub_code AND subs = $s_code AND s_id = $sid");
-                                        oci_execute($getgpa);
-                
-                                        while ($d = oci_fetch_array($getgpa)) {
-                                            $hrs = $d['SUBJECT_CREDIT_HRS'];
-                                        }
-                
-                                        $currentDate = date('Y-m-d');
-                                        $pro_gpa_hrs = $gpa * $hrs;
-                
-                                        // Check if a record already exists
-                                        $check_cum = oci_parse($conn, "SELECT COUNT(*) AS RECORD_COUNT FROM STUDENT_CUMULATIVE WHERE S_ID = $sid AND sub_code = $sub_code AND subj_code = $s_code AND stud_id = '$stud_id'");
+
+
+
+                                if (oci_execute($sql)) {
+                                    $stud_id = $stuid;
+                                    $s_code = $class_code;
+                                    // Fetch total marks for the student
+                                    $gettotal = "SELECT * FROM STUDENT A JOIN STUDENT_EVALUATION B ON (A.STUD_ID=B.STUD_ID) WHERE B.S_ID = $sid AND MARK_STATUS = 'ACCEPTED' and B.CLASS_CODE = $class_code AND B.SUB_CODE = $sub_code AND B.EMP_ID = '$emp_id' AND B.STUD_ID = '$stud_id' and b.term = '$t' ";
+                                    $s = oci_parse($conn, $gettotal);
+                                    oci_execute($s);
+
+                                    while ($a = oci_fetch_array($s)) {
+                                        $total = $a["CONST_ASS"] + $a["EXAM"];
+                                    }
+
+                                    // Fetch grade information based on total marks
+                                    $getgrade = oci_parse($conn, "SELECT * FROM GRADE A JOIN GRADE_SETTING B ON A.G_CODE = B.G_CODE WHERE B.START_GRADE_RANGE <= CAST($total AS INT) AND CAST($total AS INT) <= B.END_GRADE_RANGE AND B.S_ID  = $sid ORDER BY A.GRADE");
+                                    oci_execute($getgrade);
+
+                                    while ($b = oci_fetch_array($getgrade)) {
+                                        $g_code = $b["G_CODE"];
+                                        $grade = $b["GRADE"];
+                                    }
+
+                                    // Fetch GPA based on grade
+                                    $getgpa = oci_parse($conn, "SELECT * FROM GPA WHERE g_code = $g_code");
+                                    oci_execute($getgpa);
+
+                                    while ($c = oci_fetch_array($getgpa)) {
+                                        $gpa = $c['GPA'];
+                                    }
+
+                                    // Fetch subject credit hours
+                                    $getgpa = oci_parse($conn, "SELECT * FROM SUBJECT WHERE SUB_CODE = $sub_code AND subs = $s_code AND s_id = $sid");
+                                    oci_execute($getgpa);
+
+                                    while ($d = oci_fetch_array($getgpa)) {
+                                        $hrs = $d['SUBJECT_CREDIT_HRS'];
+                                    }
+
+                                    $currentDate = date('Y-m-d');
+                                    $pro_gpa_hrs = $gpa * $hrs;
+
+                                    // Check if a record already exists
+                                    $check_cum = oci_parse($conn, "SELECT COUNT(*) AS RECORD_COUNT FROM STUDENT_CUMULATIVE WHERE S_ID = $sid AND sub_code = $sub_code AND subj_code = $s_code AND stud_id = '$stud_id'");
+                                    oci_execute($check_cum);
+                                    oci_fetch_all($check_cum, $result);
+
+                                    if ($result['RECORD_COUNT'][0] == 0) {
+                                        // Record exists, continue to the next iteration
+                                        // Record doesn't exist, insert a new record
+                                        $check_cum = oci_parse($conn, "SELECT COUNT(*) AS RECORD_COUNT FROM STUDENT_CUMULATIVE WHERE S_ID = $sid AND subj_code = $s_code AND stud_id = '$stud_id'");
                                         oci_execute($check_cum);
                                         oci_fetch_all($check_cum, $result);
-                
-                                        if ($result['RECORD_COUNT'][0] == 0) {
-                                            // Record exists, continue to the next iteration
-                                            // Record doesn't exist, insert a new record
-                                            $check_cum = oci_parse($conn, "SELECT COUNT(*) AS RECORD_COUNT FROM STUDENT_CUMULATIVE WHERE S_ID = $sid AND subj_code = $s_code AND stud_id = '$stud_id'");
-                                            oci_execute($check_cum);
-                                            oci_fetch_all($check_cum, $result);
-                                            if ($result['RECORD_COUNT'][0] <= 9) {
-                                                $cumulative = oci_parse($conn, "INSERT INTO STUDENT_CUMULATIVE (S_ID, STUD_ID, ACADEMIC_YEAR, TERM, ENTRY_DT, SUB_CODE, SUBJ_CODE, MARK, G_CODE, GPA, CREDIT_HRS, TOTAL_GPA_CREDIT) 
+                                        if ($result['RECORD_COUNT'][0] <= 9) {
+                                            $cumulative = oci_parse($conn, "INSERT INTO STUDENT_CUMULATIVE (S_ID, STUD_ID, ACADEMIC_YEAR, TERM, ENTRY_DT, SUB_CODE, SUBJ_CODE, MARK, G_CODE, GPA, CREDIT_HRS, TOTAL_GPA_CREDIT) 
                                           VALUES ($sid, '$stud_id', '$a_y', '$t', '$currentDate', $s_code, $sub_code, $total, $g_code, $gpa, $hrs, $pro_gpa_hrs)");
-                                                oci_execute($cumulative);
-                                            }
+                                            oci_execute($cumulative);
                                         }
-                                            ?><div style="font-size:15px;
+                                    }
+        ?><div style="font-size:15px;
                                             color: green;
                                             position: relative;
                                              display:flex;
                                              margin-left:10px;
                                             animation:button .3s linear;text-align: center;">
-                                                        <?php echo '<script>
+                                        <?php echo '<script>
 															Swal.fire({
 																position: "center",
 																icon: "success",
@@ -3211,19 +3216,17 @@ $user = $_SESSION['username'];
 																timer: 1500
 															  });
 															</script>';
-                                                                          header("refresh:2;");
-                                                        ?></div><?php
-                                        }
-
-
-                                      }else {
-                                        ?><div style="font-size:15px;
+                                        header("refresh:2;");
+                                        ?></div><?php
+                                                            }
+                                                        } else {
+                                                                ?><div style="font-size:15px;
                                         color: red;
                                         position: relative;
                                          display:flex;
                                          margin-left:10px;
                                         animation:button .3s linear;text-align: center;">
-                                                    <?php echo '<script>
+                                    <?php echo '<script>
 															Swal.fire({
 																position: "center",
 																icon: "error",
@@ -3232,17 +3235,17 @@ $user = $_SESSION['username'];
 																timer: 1500
 															  });
 															</script>';
-                                                                        header("refresh:2;");
-                                                    ?></div><?php
-                                      }
-                                  }else {
-                                    ?><div style="font-size:15px;
+                                                            header("refresh:2;");
+                                    ?></div><?php
+                                                        }
+                                                    } else {
+                                                            ?><div style="font-size:15px;
                                     color: red;
                                     position: relative;
                                      display:flex;
                                      margin-left:10px;
                                     animation:button .3s linear;text-align: center;">
-                                                <?php echo '<script>
+                                <?php echo '<script>
 															Swal.fire({
 																position: "center",
 																icon: "warning",
@@ -3251,17 +3254,17 @@ $user = $_SESSION['username'];
 																timer: 1500
 															  });
 															</script>';
-                                                                    header("refresh:2;");
-                                                ?></div><?php
-                                  }
-                            } else {
-                                ?><div style="font-size:15px;
+                                                        header("refresh:2;");
+                                ?></div><?php
+                                                    }
+                                                } else {
+                                                        ?><div style="font-size:15px;
                                 color: red;
                                 position: relative;
                                  display:flex;
                                  margin-left:10px;
                                 animation:button .3s linear;text-align: center;">
-                                            <?php  echo '<script>
+                            <?php echo '<script>
 															Swal.fire({
 																position: "center",
 																icon: "warning",
@@ -3270,17 +3273,17 @@ $user = $_SESSION['username'];
 																timer: 1500
 															  });
 															</script>';
-                                                                header("refresh:2;");
-                                            ?></div><?php
-                            }
-                        } else {
-                ?><div style="font-size:15px;
+                                                    header("refresh:2;");
+                            ?></div><?php
+                                                }
+                                            } else {
+                                                    ?><div style="font-size:15px;
                         color: red;
                         position: relative;
                          display:flex;
                          margin-left:10px;
                         animation:button .3s linear;text-align: center;">
-                                <?php  echo '<script>
+                        <?php echo '<script>
 															Swal.fire({
 																position: "center",
 																icon: "warning",
@@ -3289,17 +3292,335 @@ $user = $_SESSION['username'];
 																timer: 1500
 															  });
 															</script>';
-                                header("refresh:2;");
-                                ?></div><?php
-                                    }
-                                } else {
+                                                header("refresh:2;");
+                        ?></div><?php
+                                            }
+                                        } else {
                                         ?><div style="font-size:15px;
                         color: red;
                         position: relative;
                          display:flex;
                          margin-left:10px;
                         animation:button .3s linear;text-align: center;">
-                            <?php  echo '<script>
+                    <?php echo '<script>
+															Swal.fire({
+																position: "center",
+																icon: "warning",
+																title: "SELECT TERM",
+																showConfirmButton: false,
+																timer: 1500
+															  });
+															</script>';
+                                            header("refresh:2;");
+                    ?></div><?php
+                                        }
+                                    }
+
+                                    ?>
+
+        <?php
+        if (isset($_POST['edit_mark'])) {
+            $stuid = $_SESSION['STID'];
+            $sql = oci_parse($conn, "SELECT * FROM CLASS_STUDENT WHERE STUD_ID = '$stuid' ");
+            oci_execute($sql);
+            while ($row = oci_fetch_array($sql)) {
+                $class_code = $row['SUB_CODE'];
+            }
+            if (isset($_POST['edit_stud_term'])) {
+                $t = $_POST['edit_stud_term'];
+                $getyear = oci_parse($conn, "SELECT * FROM TERM_CALENDAR WHERE TERM = '$t' ");
+                oci_execute($getyear);
+                while ($row = oci_fetch_array($getyear)) {
+                    $a_y = $row['ACADEMIC_YEAR'];
+                }
+                if (isset($_POST['edit_stud_subject'])) {
+                    $sub_code = $_POST['edit_stud_subject'];
+                    $cass = $_POST['cas'];
+
+                    if ($cass != '') {
+                        $cass = $cass * 0.3;
+                        $exam = $_POST['exam'];
+                        if ($exam != '') {
+                            $exam = $exam * 0.7;
+                            $tt = $cass + $exam;
+                            //   echo "UPDATE STUDENT_EVALUATION SET CONST_ASS = $cass , EXAM= $exam where term = '$t' and SUB_CODE = $sub_code and CLASS_CODE = $class_code ";
+                            $sql = oci_parse($conn, "UPDATE STUDENT_EVALUATION SET CONST_ASS = $cass , EXAM= $exam where term = '$t' and SUB_CODE = $sub_code and CLASS_CODE = $class_code and stud_id= '$stuid' ");
+                            if (oci_execute($sql)) {
+                                // Fetch grade information based on total marks
+                                $getgrade = oci_parse($conn, "SELECT * FROM GRADE A JOIN GRADE_SETTING B ON A.G_CODE = B.G_CODE WHERE B.START_GRADE_RANGE <= CAST($tt AS INT) AND CAST($tt AS INT) <= B.END_GRADE_RANGE AND B.S_ID  = $sid ORDER BY A.GRADE");
+                                oci_execute($getgrade);
+
+                                while ($b = oci_fetch_array($getgrade)) {
+                                    $g_code = $b["G_CODE"];
+                                    $grade = $b["GRADE"];
+                                }
+
+                                // Fetch GPA based on grade
+                                $getgpa = oci_parse($conn, "SELECT * FROM GPA WHERE g_code = $g_code");
+                                oci_execute($getgpa);
+
+                                while ($c = oci_fetch_array($getgpa)) {
+                                    $gpa = $c['GPA'];
+                                }
+
+                                // Fetch subject credit hours
+                                $getgpa = oci_parse($conn, "SELECT * FROM SUBJECT WHERE SUB_CODE = $sub_code AND subs = $class_code AND s_id = $sid");
+                                oci_execute($getgpa);
+
+                                while ($d = oci_fetch_array($getgpa)) {
+                                    $hrs = $d['SUBJECT_CREDIT_HRS'];
+                                }
+                                $pro_gpa_hrs = $gpa * $hrs;
+                                $currentDate = date('Y-m-d');
+                                $sql = oci_parse($conn, "UPDATE STUDENT_CUMULATIVE SET MARK = $tt , G_CODE = $g_code , GPA = $gpa , TOTAL_GPA_CREDIT = $pro_gpa_hrs WHERE STUD_ID = '$stuid' AND SUBJ_CODE = $sub_code and SUB_CODE = $class_code and term = '$t' ");
+                                if (oci_execute($sql)) {
+                                    $sql = oci_parse($conn, "DELETE FROM STUDENT_STANDINGS WHERE STUD_ID = '$stuid' AND class_CODE = $class_code and term = '$t'");
+                                    oci_execute($sql);
+        ?><div style="font-size:15px;
+                                                                color: green;
+                                                                position: relative;
+                                                                 display:flex;
+                                                                 margin-left:10px;
+                                                                animation:button .3s linear;text-align: center;">
+                                        <?php echo '<script>
+															Swal.fire({
+																position: "center",
+																icon: "success",
+																title: "MARK EDITED SUCCESSFULY",
+																showConfirmButton: false,
+																timer: 1500
+															  });
+															</script>';
+                                        header("refresh:2;");
+                                        ?></div><?php
+                                                            }
+                                                            //echo "UPDATE STUDENT_CUMULATIVE SET MARK = $tt , G_CODE = $g_code , GPA = $gpa , TOTAL_GPA_CREDIT = $pro_gpa_hrs WHERE STUD_ID = '$stuid' AND SUBJ_CODE = $sub_code and SUB_CODE = $class_code and term = '$t' ";
+                                                        }
+                                                    } else {
+                                                                ?><div style="font-size:15px;
+                                    color: red;
+                                    position: relative;
+                                     display:flex;
+                                     margin-left:10px;
+                                    animation:button .3s linear;text-align: center;">
+                                <?php echo '<script>
+															Swal.fire({
+																position: "center",
+																icon: "warning",
+																title: "ENTER EXAM MARK",
+																showConfirmButton: false,
+																timer: 1500
+															  });
+															</script>';
+                                                        header("refresh:2;");
+                                ?></div><?php
+                                                    }
+                                                } else {
+                                                        ?><div style="font-size:15px;
+                                color: red;
+                                position: relative;
+                                 display:flex;
+                                 margin-left:10px;
+                                animation:button .3s linear;text-align: center;">
+                            <?php echo '<script>
+															Swal.fire({
+																position: "center",
+																icon: "warning",
+																title: "ENTER CASS MARK",
+																showConfirmButton: false,
+																timer: 1500
+															  });
+															</script>';
+                                                    header("refresh:2;");
+                            ?></div><?php
+                                                }
+                                            } else {
+                                                    ?><div style="font-size:15px;
+                            color: red;
+                            position: relative;
+                             display:flex;
+                             margin-left:10px;
+                            animation:button .3s linear;text-align: center;">
+                        <?php echo '<script>
+															Swal.fire({
+																position: "center",
+																icon: "warning",
+																title: "SELECT SUBJECT",
+																showConfirmButton: false,
+																timer: 1500
+															  });
+															</script>';
+                                                header("refresh:2;");
+                        ?></div><?php
+                                            }
+                                        } else {
+                                                ?><div style="font-size:15px;
+                    color: red;
+                    position: relative;
+                     display:flex;
+                     margin-left:10px;
+                    animation:button .3s linear;text-align: center;">
+                    <?php echo '<script>
+															Swal.fire({
+																position: "center",
+																icon: "warning",
+																title: "SELECT TERM",
+																showConfirmButton: false,
+																timer: 1500
+															  });
+															</script>';
+                                            header("refresh:2;");
+                    ?></div><?php
+                                        }
+                                    }
+
+                                            ?>
+        </div>
+
+        </div>
+
+        <div style="display:flex; margin-top:20px;">
+            <Label style="font-size: 18px; font-family: righteous;
+         font-weight: bold; color: #909290;">Remove Student Mark</Label>
+        </div>
+        <div class="input-container" style="display: flex;">
+
+
+            <?php $get_hos = "SELECT DISTINCT(C.TERM) FROM STUDENT A JOIN STUDENT_EVALUATION B ON (A.STUD_ID=B.STUD_ID) JOIN TERM_CALENDAR C ON (B.TERM = C.TERM) where b.stud_id = '$stuid' ORDER BY C.TERM ";
+            //echo  $get_hos;
+            ?>
+            <div class="input-field" style="margin-right: 10px; ">
+                <label for="subjectCode">Term</label>
+                <select required name="stud_term">
+                    <option disabled selected>Select Term</option>
+                    <?php
+                    $get = oci_parse(oci_connect($username, $password, $connection), $get_hos);
+                    oci_execute($get);
+                    while ($row = oci_fetch_array($get)) {
+                    ?><option>
+                            <?php echo $row["TERM"]; ?>
+                        </option> <?php
+                                }
+                                    ?>
+                </select>
+                <?php // echo "SELECT DISTINCT(A.SUB_CODE),B.SUBJECT FROM STUDENT_SUBJECT A JOIN WAEC_SUBJECT B ON (A.Sub_code=B.sub_code)  where a.stud_id = '$stuid' ORDER BY B.SUBJECT "
+                ?>
+                <label for="subjectCode">Subject</label>
+                <select required name="stud_subject">
+                    <option disabled selected>Select Subject</option>
+                    <?php
+                    $get_hos = "SELECT DISTINCT(A.SUB_CODE),B.SUBJECT FROM STUDENT_SUBJECT A JOIN WAEC_SUBJECT B ON (A.Sub_code=B.sub_code)  where a.stud_id = '$stuid' ORDER BY B.SUBJECT ";
+                    $get = oci_parse(oci_connect($username, $password, $connection), $get_hos);
+                    oci_execute($get);
+                    while ($row = oci_fetch_array($get)) {
+                    ?><option value="<?php echo $row["SUB_CODE"]; ?> ">
+                            <?php echo $row["SUBJECT"]; ?>
+                        </option> <?php
+                                }
+                                    ?>
+                </select>
+                <button style=" display: inline-block;
+  padding: 6px 12px;
+  background-color: #909290;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  margin-top:10px;
+  margin-bottom:10px;
+  text-decoration: none;" name="remove_mark" type="submit">
+                    REMOVE MARK
+                    <i class="uil uil-trash-alt"></i>
+                </button>
+            </div>
+        </div>
+        <?php
+        if (isset($_POST['remove_mark'])) {
+            if (isset($_POST['stud_term'])) {
+                if (isset($_POST['stud_subject'])) {
+                    $term = $_POST['stud_term'];
+                    $subj = $_POST['stud_subject'];
+                    $stuid = $_SESSION['STID'];
+
+                    $sql = oci_parse($conn, "SELECT *  FROM STUDENT_EVALUATION WHERE TERM = '$term' AND SUB_CODE = $subj AND STUD_ID ='$stuid' ");
+                    //   echo "SELECT *  FROM STUDENT_EVALUATION WHERE TERM = '$term' AND SUB_CODE = $subj AND STUD_ID ='$stuid' ";
+                    oci_execute($sql);
+                    if (oci_fetch_all($sql, $a) > 0) {
+                        //echo "DELETE  FROM STUDENT_EVALUATION WHERE TERM = '$term' AND SUB_CODE = $subj AND STUD_ID ='$stuid' ";
+                        $sql = oci_parse($conn, "DELETE  FROM STUDENT_EVALUATION WHERE TERM = '$term' AND SUB_CODE = $subj AND STUD_ID ='$stuid' ");
+                        oci_execute($sql);
+
+                        $sql = oci_parse($conn, "DELETE  FROM STUDENT_CUMULATIVE  WHERE TERM = '$term' AND SUBJ_CODE = $subj AND STUD_ID ='$stuid'");
+                        oci_execute($sql);
+
+                        $sql = oci_parse($conn, "DELETE  FROM STUDENT_STANDINGS WHERE TERM = '$term' AND STUD_ID ='$stuid' ");
+                        oci_execute($sql);
+
+                        $sql =  oci_parse($conn, "INSERT INTO DELETE_MARK_LOG (USERNAME,CLASS_CODE,SUB_CODE,ENTRY_DT,TERM) VALUES ('$user',$sub_cd,$subj,SYSDATE,'$term' )");
+                        if (oci_execute($sql)) {
+        ?><div style="font-size:15px;
+                         color: green;
+                         position: relative;
+                          display:flex;
+                          margin-left:10px;
+                         animation:button .3s linear;text-align: center;">
+                                <?php echo '<script>
+															Swal.fire({
+																position: "center",
+																icon: "success",
+																title: "MARK REMOVED",
+																showConfirmButton: false,
+																timer: 1500
+															  });
+															</script>';
+                                header("refresh:2;");
+                                ?></div><?php
+                                            }
+                                        } else {
+                                                ?><div style="font-size:15px;
+                        color: red;
+                        position: relative;
+                         display:flex;
+                         margin-left:10px;
+                        animation:button .3s linear;text-align: center;">
+                            <?php echo '<script>
+															Swal.fire({
+																position: "center",
+																icon: "error",
+																title: "MARK NOT ENTERED FOR STUDENT",
+																showConfirmButton: false,
+																timer: 1500
+															  });
+															</script>';
+                                            //         header("refresh:2;");
+                            ?></div><?php
+                                        }
+                                    } else {
+                                            ?><div style="font-size:15px;
+                    color: red;
+                    position: relative;
+                     display:flex;
+                     margin-left:10px;
+                    animation:button .3s linear;text-align: center;">
+                        <?php echo '<script>
+															Swal.fire({
+																position: "center",
+																icon: "warning",
+																title: "SELECT SUBJECT",
+																showConfirmButton: false,
+																timer: 1500
+															  });
+															</script>';
+                                        header("refresh:2;");
+                        ?></div><?php
+                                    }
+                                } else {
+                                        ?><div style="font-size:15px;
+                color: red;
+                position: relative;
+                 display:flex;
+                 margin-left:10px;
+                animation:button .3s linear;text-align: center;">
+                    <?php echo '<script>
 															Swal.fire({
 																position: "center",
 																icon: "warning",
@@ -3309,332 +3630,19 @@ $user = $_SESSION['username'];
 															  });
 															</script>';
                                     header("refresh:2;");
-                            ?></div><?php
-                                    }
+                    ?></div><?php
                                 }
-
-                                        ?>
-         
-                        <?php
-                        if (isset($_POST['edit_mark'])) {
-                            $stuid = $_SESSION['STID'];
-                            $sql = oci_parse($conn, "SELECT * FROM CLASS_STUDENT WHERE STUD_ID = '$stuid' ");
-                            oci_execute($sql);
-                            while ($row = oci_fetch_array($sql)) {
-                                $class_code = $row['SUB_CODE'];
                             }
-                            if (isset($_POST['edit_stud_term'])) {
-                                $t = $_POST['edit_stud_term'];
-                                if (isset($_POST['edit_stud_subject'])) {
-                                    $sub_code = $_POST['edit_stud_subject'];
-                                    $cass = $_POST['cas'];
-
-                                    if ($cass != '') {
-                                        $cass = $cass * 0.3;
-                                        $exam = $_POST['exam'];
-                                        if ($exam != '') {
-                                            $exam = $exam * 0.7;
-                                            $tt = $cass + $exam;
-                                            //   echo "UPDATE STUDENT_EVALUATION SET CONST_ASS = $cass , EXAM= $exam where term = '$t' and SUB_CODE = $sub_code and CLASS_CODE = $class_code ";
-                                            $sql = oci_parse($conn, "UPDATE STUDENT_EVALUATION SET CONST_ASS = $cass , EXAM= $exam where term = '$t' and SUB_CODE = $sub_code and CLASS_CODE = $class_code and stud_id= '$stuid' ");
-                                            if (oci_execute($sql)) {
-                                                // Fetch grade information based on total marks
-                                                $getgrade = oci_parse($conn, "SELECT * FROM GRADE A JOIN GRADE_SETTING B ON A.G_CODE = B.G_CODE WHERE B.START_GRADE_RANGE <= CAST($tt AS INT) AND CAST($tt AS INT) <= B.END_GRADE_RANGE AND B.S_ID  = $sid ORDER BY A.GRADE");
-                                                oci_execute($getgrade);
-
-                                                while ($b = oci_fetch_array($getgrade)) {
-                                                    $g_code = $b["G_CODE"];
-                                                    $grade = $b["GRADE"];
-                                                }
-
-                                                // Fetch GPA based on grade
-                                                $getgpa = oci_parse($conn, "SELECT * FROM GPA WHERE g_code = $g_code");
-                                                oci_execute($getgpa);
-
-                                                while ($c = oci_fetch_array($getgpa)) {
-                                                    $gpa = $c['GPA'];
-                                                }
-
-                                                // Fetch subject credit hours
-                                                $getgpa = oci_parse($conn, "SELECT * FROM SUBJECT WHERE SUB_CODE = $sub_code AND subs = $class_code AND s_id = $sid");
-                                                oci_execute($getgpa);
-
-                                                while ($d = oci_fetch_array($getgpa)) {
-                                                    $hrs = $d['SUBJECT_CREDIT_HRS'];
-                                                }
-                                                $pro_gpa_hrs = $gpa * $hrs;
-                                                $currentDate = date('Y-m-d');
-                                                $sql = oci_parse($conn, "UPDATE STUDENT_CUMULATIVE SET MARK = $tt , G_CODE = $g_code , GPA = $gpa , TOTAL_GPA_CREDIT = $pro_gpa_hrs WHERE STUD_ID = '$stuid' AND SUBJ_CODE = $sub_code and SUB_CODE = $class_code and term = '$t' ");
-                                                if (oci_execute($sql)) {
-                                                    $sql = oci_parse($conn, "DELETE FROM STUDENT_STANDINGS WHERE STUD_ID = '$stuid' AND class_CODE = $class_code and term = '$t'");
-                                                    oci_execute($sql);
-                        ?><div style="font-size:15px;
-                                                                color: green;
-                                                                position: relative;
-                                                                 display:flex;
-                                                                 margin-left:10px;
-                                                                animation:button .3s linear;text-align: center;">
-                                                        <?php  echo '<script>
-															Swal.fire({
-																position: "center",
-																icon: "success",
-																title: "MARK EDITED SUCCESSFULY",
-																showConfirmButton: false,
-																timer: 1500
-															  });
-															</script>';
-                                                        header("refresh:2;");
-                                                        ?></div><?php
-                                                                        }
-                                                                        //echo "UPDATE STUDENT_CUMULATIVE SET MARK = $tt , G_CODE = $g_code , GPA = $gpa , TOTAL_GPA_CREDIT = $pro_gpa_hrs WHERE STUD_ID = '$stuid' AND SUBJ_CODE = $sub_code and SUB_CODE = $class_code and term = '$t' ";
-                                                                    }
-                                                                } else {
-                                                                            ?><div style="font-size:15px;
-                                    color: red;
-                                    position: relative;
-                                     display:flex;
-                                     margin-left:10px;
-                                    animation:button .3s linear;text-align: center;">
-                                                <?php  echo '<script>
-															Swal.fire({
-																position: "center",
-																icon: "warning",
-																title: "ENTER EXAM MARK",
-																showConfirmButton: false,
-																timer: 1500
-															  });
-															</script>';
-                                                                    header("refresh:2;");
-                                                ?></div><?php
-                                                                }
-                                                            } else {
-                                                ?><div style="font-size:15px;
-                                color: red;
-                                position: relative;
-                                 display:flex;
-                                 margin-left:10px;
-                                animation:button .3s linear;text-align: center;">
-                                            <?php  echo '<script>
-															Swal.fire({
-																position: "center",
-																icon: "warning",
-																title: "ENTER CASS MARK",
-																showConfirmButton: false,
-																timer: 1500
-															  });
-															</script>';
-                                                                header("refresh:2;");
-                                            ?></div><?php
-                                                            }
-                                                        } else {
-                                            ?><div style="font-size:15px;
-                            color: red;
-                            position: relative;
-                             display:flex;
-                             margin-left:10px;
-                            animation:button .3s linear;text-align: center;">
-                                        <?php  echo '<script>
-															Swal.fire({
-																position: "center",
-																icon: "warning",
-																title: "SELECT SUBJECT",
-																showConfirmButton: false,
-																timer: 1500
-															  });
-															</script>';
-                                                            header("refresh:2;");
-                                        ?></div><?php
-                                                        }
-                                                    } else {
-                                        ?><div style="font-size:15px;
-                    color: red;
-                    position: relative;
-                     display:flex;
-                     margin-left:10px;
-                    animation:button .3s linear;text-align: center;">
-                                    <?php  echo '<script>
-															Swal.fire({
-																position: "center",
-																icon: "warning",
-																title: "SELECT TERM",
-																showConfirmButton: false,
-																timer: 1500
-															  });
-															</script>';
-                                                        header("refresh:2;");
-                                    ?></div><?php
-                                                    }
-                                                }
-
                                     ?>
-                    </div>
+        <div class="buttons">
 
-                </div>
+            <button class="backBtn" type="submit">
+                <a class="btnText" href="select_class_enroll.php">
+                    BACK
+                </a>
+            </button>
 
-                <div style="display:flex; margin-top:20px;">
-                    <Label style="font-size: 18px; font-family: righteous;
-         font-weight: bold; color: #909290;">Remove Student Mark</Label>
-                </div>
-                <div class="input-container" style="display: flex;">
-
-
-                    <?php $get_hos = "SELECT DISTINCT(C.TERM) FROM STUDENT A JOIN STUDENT_EVALUATION B ON (A.STUD_ID=B.STUD_ID) JOIN TERM_CALENDAR C ON (B.TERM = C.TERM) where b.stud_id = '$stuid' ORDER BY C.TERM ";
-                    //echo  $get_hos;
-                    ?>
-                    <div class="input-field" style="margin-right: 10px; ">
-                        <label for="subjectCode">Term</label>
-                        <select required name="stud_term">
-                            <option disabled selected>Select Term</option>
-                            <?php
-                            $get = oci_parse(oci_connect($username, $password, $connection), $get_hos);
-                            oci_execute($get);
-                            while ($row = oci_fetch_array($get)) {
-                            ?><option>
-                                    <?php echo $row["TERM"]; ?>
-                                </option> <?php
-                                        }
-                                            ?>
-                        </select>
-                        <?php // echo "SELECT DISTINCT(A.SUB_CODE),B.SUBJECT FROM STUDENT_SUBJECT A JOIN WAEC_SUBJECT B ON (A.Sub_code=B.sub_code)  where a.stud_id = '$stuid' ORDER BY B.SUBJECT "
-                        ?>
-                        <label for="subjectCode">Subject</label>
-                        <select required name="stud_subject">
-                            <option disabled selected>Select Subject</option>
-                            <?php
-                            $get_hos = "SELECT DISTINCT(A.SUB_CODE),B.SUBJECT FROM STUDENT_SUBJECT A JOIN WAEC_SUBJECT B ON (A.Sub_code=B.sub_code)  where a.stud_id = '$stuid' ORDER BY B.SUBJECT ";
-                            $get = oci_parse(oci_connect($username, $password, $connection), $get_hos);
-                            oci_execute($get);
-                            while ($row = oci_fetch_array($get)) {
-                            ?><option value="<?php echo $row["SUB_CODE"]; ?> ">
-                                    <?php echo $row["SUBJECT"]; ?>
-                                </option> <?php
-                                        }
-                                            ?>
-                        </select>
-                        <button style=" display: inline-block;
-  padding: 6px 12px;
-  background-color: #909290;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  margin-top:10px;
-  margin-bottom:10px;
-  text-decoration: none;" name="remove_mark" type="submit">
-                            REMOVE MARK
-                            <i class="uil uil-trash-alt"></i>
-                        </button>
-                    </div>
-                </div>
-                <?php
-                if (isset($_POST['remove_mark'])) {
-                    if (isset($_POST['stud_term'])) {
-                        if (isset($_POST['stud_subject'])) {
-                            $term = $_POST['stud_term'];
-                            $subj = $_POST['stud_subject'];
-                            $stuid = $_SESSION['STID'];
-
-                            $sql = oci_parse($conn, "SELECT *  FROM STUDENT_EVALUATION WHERE TERM = '$term' AND SUB_CODE = $subj AND STUD_ID ='$stuid' ");
-                            //   echo "SELECT *  FROM STUDENT_EVALUATION WHERE TERM = '$term' AND SUB_CODE = $subj AND STUD_ID ='$stuid' ";
-                            oci_execute($sql);
-                            if (oci_fetch_all($sql, $a) > 0) {
-                                //echo "DELETE  FROM STUDENT_EVALUATION WHERE TERM = '$term' AND SUB_CODE = $subj AND STUD_ID ='$stuid' ";
-                                $sql = oci_parse($conn, "DELETE  FROM STUDENT_EVALUATION WHERE TERM = '$term' AND SUB_CODE = $subj AND STUD_ID ='$stuid' ");
-                                oci_execute($sql);
-
-                                $sql = oci_parse($conn, "DELETE  FROM STUDENT_CUMULATIVE  WHERE TERM = '$term' AND SUBJ_CODE = $subj AND STUD_ID ='$stuid'");
-                                oci_execute($sql);
-
-                                $sql = oci_parse($conn, "DELETE  FROM STUDENT_STANDINGS WHERE TERM = '$term' AND STUD_ID ='$stuid' ");
-                                oci_execute($sql);
-
-                                $sql =  oci_parse($conn, "INSERT INTO DELETE_MARK_LOG (USERNAME,CLASS_CODE,SUB_CODE,ENTRY_DT,TERM) VALUES ('$user',$sub_cd,$subj,SYSDATE,'$term' )");
-                                if (oci_execute($sql)) {
-                ?><div style="font-size:15px;
-                         color: green;
-                         position: relative;
-                          display:flex;
-                          margin-left:10px;
-                         animation:button .3s linear;text-align: center;">
-                                        <?php  echo '<script>
-															Swal.fire({
-																position: "center",
-																icon: "success",
-																title: "MARK REMOVED",
-																showConfirmButton: false,
-																timer: 1500
-															  });
-															</script>';
-                                        header("refresh:2;");
-                                        ?></div><?php
-                                    }
-                                } else {
-                                        ?><div style="font-size:15px;
-                        color: red;
-                        position: relative;
-                         display:flex;
-                         margin-left:10px;
-                        animation:button .3s linear;text-align: center;">
-                                    <?php  echo '<script>
-															Swal.fire({
-																position: "center",
-																icon: "error",
-																title: "MARK NOT ENTERED FOR STUDENT",
-																showConfirmButton: false,
-																timer: 1500
-															  });
-															</script>';
-                                    //         header("refresh:2;");
-                                    ?></div><?php
-                                }
-                            } else {
-                                    ?><div style="font-size:15px;
-                    color: red;
-                    position: relative;
-                     display:flex;
-                     margin-left:10px;
-                    animation:button .3s linear;text-align: center;">
-                                <?php  echo '<script>
-															Swal.fire({
-																position: "center",
-																icon: "warning",
-																title: "SELECT SUBJECT",
-																showConfirmButton: false,
-																timer: 1500
-															  });
-															</script>';
-                                header("refresh:2;");
-                                ?></div><?php
-                            }
-                        } else {
-                                ?><div style="font-size:15px;
-                color: red;
-                position: relative;
-                 display:flex;
-                 margin-left:10px;
-                animation:button .3s linear;text-align: center;">
-                            <?php  echo '<script>
-															Swal.fire({
-																position: "center",
-																icon: "warning",
-																title: "SELECT TERM",
-																showConfirmButton: false,
-																timer: 1500
-															  });
-															</script>';
-                            header("refresh:2;");
-                            ?></div><?php
-                        }
-                    }
-                            ?>
-                <div class="buttons">
-
-                    <button class="backBtn" type="submit">
-                        <a class="btnText" href="select_class_enroll.php">
-                            BACK
-                        </a>
-                    </button>
-
-                </div>
+        </div>
     </form>
     <script>
         $(document).ready(function() {
@@ -3672,4 +3680,5 @@ function isjpeg_png($file)
 ?>
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </html>

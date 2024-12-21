@@ -15,21 +15,7 @@ include 'connect.php';ob_start();
 session_start();
 $school =  $_SESSION['school'];
 $sid = $_SESSION['sid']; ?>
- <style>
-            .card {
-                background-color: #909290;
-                border-radius: 10px;
-                padding: 20px;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-                margin: 20px;
-            }
 
-            .card h2 {
-                color: white;
-                text-align: center;
-                font-size: 25px;
-            }
-        </style>
 <body>
     <?php
     // Include the auto_logout.php file
@@ -65,7 +51,9 @@ $sid = $_SESSION['sid']; ?>
                         <li class="item">
                             <a href="student_pay.php">Student Payment</a>
                         </li>
-
+                        <li class="item">
+                            <a href="arrears.php">Student Arrears</a>
+                        </li>
                     </ul>
                 </li>
 
@@ -102,51 +90,57 @@ $sid = $_SESSION['sid']; ?>
                                                                                                                                                                                                     }
                                                                                                                                                                                                         ?>
         
-    
-        <div class="card">
-            <h2>Academic Year</h2>
+        <div style="font-size:25px;
+                    color: red;
+                    position: relative;
+                     display:flex;
+                    animation:button .3s linear;text-align: center;">
             <?php
-            $sql = oci_parse($conn, "select * from academic_calendar  where s_id = $sid and start_dt is not null and end_dt is not null ");
+            $sql = oci_parse($conn, "select * from academic_calendar  where s_id = $sid  ");
             oci_execute($sql);
             if (oci_fetch_all($sql, $a) > 0) {
-                $sql = oci_parse($conn, "select CEIL(TO_DATE(END_DT, 'YYYY-MM-DD') - SYSDATE) AS DAYS_BETWEEN ,START_DT,END_DT,ACADEMIC_YEAR from academic_calendar where s_id = $sid and start_dt is not null and end_dt is not null order by academic_year");
+                $sql = oci_parse($conn, "select * from academic_calendar where s_id = $sid ");
                 oci_execute($sql);
-                if ($r = oci_fetch_array($sql)) {
-                    $start_dt = $r['START_DT'];
-                    $end_dtS = $r['END_DT'];
-                    $A_Y = $r['ACADEMIC_YEAR'];
-                    $dt_1 = $r['DAYS_BETWEEN'];
+                while ($r = oci_fetch_array($sql)) {
+                    $start_dt=$r['START_DT'];
+                    $end_dt = $r['END_DT'];
+                    $a_y = $r['ACADEMIC_YEAR'];
                 }
-                if (date('Y-m-d') == $end_dtS || date('Y-m-d') > $end_dtS) {
-                    $sql = oci_parse($conn, "UPDATE TERM_CALENDAR SET STATUS = 'EXPIRED' WHERE S_ID = $sid and term = '$term' ");
+                if (date('Y-m-d') == $end_dt ||  date('Y-m-d') > $end_dt) {
+                    $sql = oci_parse($conn, "UPDATE ACADEMIC_CALENDAR SET STATUS = 'EXPIRED' WHERE S_ID = $sid and ACADEMIC_YEAR = '$term' ");
                     oci_execute($sql);
-                    echo "$term HAS ENDED!!!!!!";
+                    echo "ACADEMIC YEAR HAS ENDED!!!!!!";
                 } else {
-                    $currentDateS = date("Y-m-d");
-                    $currentDateTimeS = new DateTime($start_dt);
-                    $targetDateTimeS = new DateTime($end_dtS);
-                    $intervals = $currentDateTimeS->diff($targetDateTimeS);
-                    echo "$dt_1 Days Left To The End Of $A_Y";
-                }
+                    $currentDate = date("Y-m-d");
+                    $currentDateTime = new DateTime($start_dt);
+                    $targetDateTime = new DateTime($end_dt);
+                    ///Calculate the difference in days
+                    $interval = $currentDateTime->diff($targetDateTime);
+                    //  $numberOfDays = $interval->days;
+                    echo "$interval->days Days Left To The End Of $a_y";
+                };
             }
             ?>
         </div>
-
-        <div class="card">
-            <h2>Term</h2>
+        <div style="font-size:25px;
+                    color: red;
+                    position: relative;
+                     display:flex;
+                    animation:button .3s linear;text-align: center;">
             <?php
-            $sql = oci_parse($conn, "select * from term_calendar  where s_id = $sid and start_dt is not null and end_dt is not null ");
+
+            $sql = oci_parse($conn, "select * from term_calendar  where s_id = $sid  ");
             oci_execute($sql);
             if (oci_fetch_all($sql, $a) > 0) {
-                $sql = oci_parse($conn, "select CEIL(TO_DATE(END_DT, 'YYYY-MM-DD') - SYSDATE) AS DAYS_BETWEEN ,START_DT,END_DT,TERM from term_calendar where s_id = $sid and start_dt is not null and end_dt is not null order by term desc");
+                $sql = oci_parse($conn, "select * from term_calendar where s_id = $sid  ");
                 oci_execute($sql);
                 if ($r = oci_fetch_array($sql)) {
-                    $start_dt = $r['START_DT'];
+                    $start_dt=$r['START_DT'];
                     $end_dtS = $r['END_DT'];
                     $term = $r['TERM'];
-                    $day = $r['DAYS_BETWEEN'];
                 }
                 if (date('Y-m-d') == $end_dtS || date('Y-m-d') > $end_dtS) {
+
                     $sql = oci_parse($conn, "UPDATE TERM_CALENDAR SET STATUS = 'EXPIRED' WHERE S_ID = $sid and term = '$term' ");
                     oci_execute($sql);
                     echo "$term HAS ENDED!!!!!!";
@@ -154,8 +148,12 @@ $sid = $_SESSION['sid']; ?>
                     $currentDateS = date("Y-m-d");
                     $currentDateTimeS = new DateTime($start_dt);
                     $targetDateTimeS = new DateTime($end_dtS);
+
+                    ///Calculate the difference in days
                     $intervals = $currentDateTimeS->diff($targetDateTimeS);
-                    echo "$day Days Left To The End Of $term";
+                    //  $numberOfDays = $interval->days;
+
+                    echo "$intervals->days Days Left To The End Of $term";
                 }
             }
             ?>

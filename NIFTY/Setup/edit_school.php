@@ -12,12 +12,12 @@
   <style>
     .field select:focus {
       padding-left: 47px;
-      border: 2px solid #1D5B79;
+      border: 2px solid #909290;
       background-color: #ffffff;
     }
 
     .field select:focus~i {
-      color: #1D5B79;
+      color: #909290;
     }
   </style>
 </head>
@@ -110,7 +110,7 @@
       </div>
       <div class="button-area">
         <div>
-        <h3><a href="setup_menu.php" style="text-decoration: none; font-size:15px; font-weight: 500px; color:#1D5B79;">Return</a></h3>
+        <h3><a href="setup_menu.php" style="text-decoration: none; font-size:15px; font-weight: 500px; color:#909290;">Return</a></h3>
         </div>
         <div type="submit">
           <input style="color: #fff;
@@ -123,7 +123,7 @@
   cursor: pointer;
   border-radius: 5px;
   padding: 10px 5px;
-  background: #1D5B79;
+  background: #909290;
   transition: background 0.3s ease;" value="Update" name="save" type="submit">
         </div>
 

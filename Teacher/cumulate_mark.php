@@ -78,13 +78,14 @@ include('auto_logout.php');
             $get_hos = "SELECT a.stud_id,a.name FROM student a JOIN student_subject b ON a.stud_id = b.stud_id JOIN class_student c ON a.stud_id = c.stud_id JOIN STUDENT_EVALUATION D on (d.stud_id=d.stud_id) WHERE b.sub_code = $sub_code  AND c.sub_code = $s_code AND a.status != 'GRADUATED' and a.stud_id = '04462023' and d.mark_status = 'ACCEPTED'
             order by a.name
           ";
-
-            $sql = oci_parse($conn, "select * from academic_calendar a join term_calendar b on (a.academic_year=b.academic_year) where b.start_dt is not null");
+            $term =    $_SESSION['term'];
+            $sql = oci_parse($conn, "select * from academic_calendar a join term_calendar b on (a.academic_year=b.academic_year) where b.term='$term'");
             oci_execute($sql);
             if ($row = oci_fetch_array($sql)) {
                 $a_y = $row['ACADEMIC_YEAR'];
                 $t = $row['TERM'];
             }
+
             ?>
         </div>
 
@@ -128,7 +129,7 @@ include('auto_logout.php');
           AND B.SUB_CODE = $sub_code
           AND B.EMP_ID = '$emp_id'  ORDER BY A.NAME
         ";
-    //  echo $sql ;
+        //  echo $sql ;
         $stid = oci_parse($conn, $sql);
         oci_execute($stid);
         ?>

@@ -19,12 +19,12 @@ include 'connect.php'; ?>
 <style>
     .field select:focus {
         padding-left: 47px;
-        border: 2px solid #1D5B79;
+        border: 2px solid #909290;
         background-color: #ffffff;
     }
 
     .field select:focus~i {
-        color: #1D5B79;
+        color: #909290;
     }
 </style>
 <?php
@@ -34,8 +34,8 @@ include('auto_logout.php');
 <body>
     <form class="container" enctype="multipart/form-data" action="show_class.php" method="post">
         <div class="com">
-            <h3 style="color:#1D5B79;">Academix: School Management System</h3>
-            <h3 class="title" style="justify-content:center; text-align:center; color:#1D5B79; 	font-size: 18px;"><?php echo $school ?>
+            <h3 style="color:#909290;">Academix: School Management System</h3>
+            <h3 class="title" style="justify-content:center; text-align:center; color:#909290; 	font-size: 18px;"><?php echo $school ?>
                 </h2>
                 <?php
                 $stmt = oci_parse($conn, "select * from school where school = :name");
@@ -80,7 +80,7 @@ include('auto_logout.php');
     overflow: hidden;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
             <thead>
-                <tr style="  background-color: #1D5B79;
+                <tr style="  background-color: #909290;
     color: #ffffff;
     text-align: left;
     font-weight: bold;">
@@ -144,7 +144,7 @@ include('auto_logout.php');
     overflow: hidden;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
             <thead>
-                <tr style="  background-color: #1D5B79;
+                <tr style="  background-color: #909290;
     color: #ffffff;
     text-align: left;
     font-weight: bold;">
@@ -195,7 +195,7 @@ include('auto_logout.php');
         <div style="display: flex;">
             <button style=" display: inline-block;
   padding: 6px 12px;
-  background-color: #1D5B79;
+  background-color: #909290;
   color: white;
   border: none;
   border-radius: 4px;

@@ -811,9 +811,9 @@ text-decoration: none;" name="generate_sub" type="submit">
             </button>
         </div>
         <?php
-        require 'C:\wamp64\www\Academix\KOTU SENIOR SECONDARY SCHOOL\Sec_Registra\PHPMailer.php';
-        require 'C:\wamp64\www\Academix\KOTU SENIOR SECONDARY SCHOOL\Sec_Registra\Exception.php';
-        require 'C:\wamp64\www\Academix\KOTU SENIOR SECONDARY SCHOOL\Sec_Registra\SMTP.php';
+        require 'D:\Junior\Registra\PHPMailer.php';
+        require 'D:\Junior\Registra\Exception.php';
+        require 'D:\Junior\Registra\SMTP.php';
 
 
 

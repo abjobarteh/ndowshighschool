@@ -12,12 +12,12 @@
     <style>
         .field select:focus {
             padding-left: 47px;
-            border: 2px solid #1D5B79;
+            border: 2px solid #909290;
             background-color: #ffffff;
         }
 
         .field select:focus~i {
-            color: #1D5B79;
+            color: #909290;
         }
     </style>
 </head>
@@ -122,7 +122,7 @@ include 'connect.php'; ?>
             </div>
             <div class="button-area">
                 <div>
-                    <h3><a href="setup_menu.php" style="text-decoration: none; font-size:15px; font-weight: 500px; color:#1D5B79;">Return</a></h3>
+                    <h3><a href="setup_menu.php" style="text-decoration: none; font-size:15px; font-weight: 500px; color:#909290;">Return</a></h3>
                 </div>
                 <div type="submit">
                     <input style="color: #fff;

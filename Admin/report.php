@@ -189,9 +189,9 @@ include('auto_logout.php');
             if (isset($_POST['generate_classlist'])) {
 
 
-                require 'C:\wamp64\www\Academix\NDOWS\Registra\PHPMailer.php';
-                require 'C:\wamp64\www\Academix\NDOWS\Registra\Exception.php';
-                require 'C:\wamp64\www\Academix\NDOWS\Registra\SMTP.php';
+                require 'D:\Junior\Registra\PHPMailer.php';
+                require 'D:\Junior\Registra\Exception.php';
+                require 'D:\Junior\Registra\SMTP.php';
                 if (isset($_POST['report_type'])) {
                     $rpt_type = $_POST['report_type'];
                     if ($rpt_type == 'PDF') {

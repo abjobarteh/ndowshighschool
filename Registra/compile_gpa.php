@@ -9,6 +9,9 @@
     <link rel="stylesheet" href="css/show_users.css">
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" type="text/css" href="https://common.olemiss.edu/_js/sweet-alert/sweet-alert.css" />
 </head>
 <?php
 include 'connect.php';
@@ -16,8 +19,9 @@ ob_start();
 session_start();
 $class = '';
 $school =  $_SESSION['school'];
-$s_code = $_SESSION['s_code'];
+$s_code =  $_SESSION['sub_code'];
 $emp_id = $_SESSION['emp_id'];
+$term = $_SESSION['term'];
 $sid = $_SESSION['sid']; ?>
 <style>
     .field select:focus {
@@ -77,6 +81,7 @@ include('auto_logout.php');
         if ($rowS = oci_fetch_array($sql)) {
             $name = $rowS["NAME"];
         }
+        //    echo "SELECT * FROM SUB_CLASS WHERE sub_code = $s_code and s_id = $sid";
         $sql = oci_parse($conn, "SELECT * FROM SUB_CLASS WHERE sub_code = $s_code and s_id = $sid ");
         oci_execute($sql);
         if ($rowS = oci_fetch_array($sql)) {
@@ -89,11 +94,12 @@ include('auto_logout.php');
         <div class="input-field">
             <?php
 
-            $sql = oci_parse($conn, "select * from academic_calendar a join term_calendar b on (a.academic_year=b.academic_year) where b.start_dt is not null");
+            $sql = oci_parse($conn, "select * from academic_calendar a join term_calendar b on (a.academic_year=b.academic_year) where b.term = '$term' ");
             oci_execute($sql);
             if ($row = oci_fetch_array($sql)) {
                 $a_y = $row['ACADEMIC_YEAR'];
                 $t = $row['TERM'];
+                //         $t = $row['TERM'];
             }
             ?>
         </div>
@@ -113,10 +119,7 @@ include('auto_logout.php');
                     <label>Term</label>
                     <input type="text" placeholder="<?php echo $t ?>" style="width:300px;" readonly>
                 </div>
-                <div class="input-field" style="margin-right: 10px;">
-                    <label>Grade</label>
-                    <input type="text" placeholder="<?php echo $class_name ?>" style="width:300px;" readonly>
-                </div>
+
             </div>
             <button style=" display: inline-block;
   padding: 6px 12px;
@@ -131,7 +134,7 @@ include('auto_logout.php');
                 <i class="uil uil-exposure-increase"></i>
             </button>
             <?php
-            $sql = "SELECT DISTINCT(A.STUD_ID),A.NAME
+            $sql = "SELECT DISTINCT(A.STUD_ID),A.NAME,D.SUB_CODE
                   FROM STUDENT A
                    JOIN STUDENT_CUMULATIVE D ON (A.STUD_ID=D.STUD_ID) 
                   WHERE
@@ -143,56 +146,43 @@ include('auto_logout.php');
         AND S.ACADEMIC_YEAR = D.ACADEMIC_YEAR
         AND S.TERM = D.TERM
         AND S.S_ID = D.S_ID
-        AND S.CLASS_CODE = $s_code
-       
-                  ) and D.SUB_CODE= $s_code ORDER BY A.NAME
+                  ) AND A.STATUS !='GRADUATED'  ORDER BY A.NAME
                   ";
-            //echo $sql;
+            //  echo $sql;
             if (isset($_POST['compile'])) {
 
                 $getstu = oci_parse($conn, $sql);
                 oci_execute($getstu);
-                //   echo $sql;
-                $sqll = oci_parse($conn, "delete from student_standings where class_code = $s_code and ACADEMIC_YEAR = '$a_y' AND TERM='$t'");
+
+                $sqll = oci_parse($conn, "delete from student_standings wheRE ACADEMIC_YEAR = '$a_y' AND TERM='$t'");
                 oci_execute($sqll);
                 if (oci_fetch_all($getstu, $z) > 0) {
                     $getstu = oci_parse($conn, $sql);
                     oci_execute($getstu);
                     while ($row = oci_fetch_array($getstu)) {
                         $stud_id = $row["STUD_ID"];
+                        $s_code = $row['SUB_CODE'];
                         // echo $stud_id;
                         $sql = oci_parse($conn, "SELECT * FROM STUDENT_CUMULATIVE WHERE STUD_ID = '$stud_id' AND SUB_CODE = $s_code  AND ACADEMIC_YEAR = '$a_y' AND TERM='$t'");
+                        // echo "SELECT * FROM STUDENT_CUMULATIVE WHERE STUD_ID = '$stud_id' AND SUB_CODE = $s_code  AND ACADEMIC_YEAR = '$a_y' AND TERM='$t'";
                         oci_execute($sql);
                         $cnt = oci_fetch_all($sql, $a);
                         if ($cnt < 8) {
                             continue;
                         }
-                      
-                        $SQL = oci_parse($conn, "SELECT ROUND(AVG(MARK),1) AS AVERAGE FROM STUDENT_CUMULATIVE WHERE STUD_ID = '$stud_id' AND TERM = '$t' AND SUB_CODE = $s_code");
+
+
+                        $SQL = oci_parse($conn, "SELECT ROUND(AVG(MARK),2) AS GPA FROM STUDENT_CUMULATIVE WHERE STUD_ID = '$stud_id' AND TERM = '$t' AND SUB_CODE = $s_code");
                         oci_execute($SQL);
                         while ($row = oci_fetch_array($SQL)) {
-                            $avg = $row["AVERAGE"];
+                            $gpa = $row["GPA"];
                             //  echo $gpa;
                         }
-                        $getgrade = oci_parse($conn, "SELECT * FROM GRADE A JOIN GRADE_SETTING B ON A.G_CODE = B.G_CODE WHERE B.START_GRADE_RANGE <= CAST($avg AS INT) AND CAST($avg AS INT) <= B.END_GRADE_RANGE  ORDER BY A.GRADE");
-                        oci_execute($getgrade);
 
-                        while ($b = oci_fetch_array($getgrade)) {
-                            $g_code = $b["G_CODE"];
-                            $grade = $b["GRADE"];
-                        }
-
-                        $sql = oci_parse($conn, "SELECT * FROM GPA WHERE G_CODE = :G_CODE");
-                        oci_bind_by_name($sql, ":G_CODE", $g_code);
-                        oci_execute($sql);
-                        while ($get = oci_fetch_array($sql)) {
-                            $gpa = $get['GPA'];
-                        }
-                        $sql = oci_parse($conn, "INSERT INTO STUDENT_STANDINGS (S_ID,GPA,CLASS_CODE,ACADEMIC_YEAR,TERM,STUD_ID,STATUS,AVERAGE) VALUES ($sid,$gpa,$s_code,'$a_y','$t','$stud_id','COMPILED','$avg')
+                        $sql = oci_parse($conn, "INSERT INTO STUDENT_STANDINGS (S_ID,AVERAGE,CLASS_CODE,ACADEMIC_YEAR,TERM,STUD_ID,STATUS) VALUES ($sid,$gpa,$s_code,'$a_y','$t','$stud_id','COMPILED')
                         ");
                         //     echo "INSERT INTO STDUENT_STANDINGS (S_ID,GPA,CLASS_CODE,ACADEMIC_YEAR,TERM,STUD_ID) VALUES ($sid,$gpa,$s_code,'$a_y','$t','$stud_id')";
                         oci_execute($sql);
-                        //     echo "INSERT INTO STDUENT_STANDINGS (S_ID,GPA,CLASS_CODE,ACADEMIC_YEAR,TERM,STUD_ID) VALUES ($sid,$gpa,$s_code,'$a_y','$t','$stud_id')"
                     }
             ?><div style="font-size:15px;
                     color: green;
@@ -214,8 +204,8 @@ include('auto_logout.php');
                     </div> <?php
                         }
                     }
-                    //  echo "SELECT A.STUD_ID,A.NAME,B.GPA FROM STUDENT A JOIN  STUDENT_STANDINGS B ON (A.STUD_ID=B.STUD_ID) WHERE b.S_ID = $sid and b.class_code = $s_code ";
-                    $showgpa =  oci_parse($conn, "SELECT A.STUD_ID,A.NAME,ROUND(B.GPA/1.00,2) AS GPA FROM STUDENT A JOIN  STUDENT_STANDINGS B ON (A.STUD_ID=B.STUD_ID) WHERE b.S_ID = $sid and b.class_code = $s_code ");
+                    //   echo "SELECT A.STUD_ID,A.NAME,ROUND(B.GPA/1.00,2) AS GPA FROM STUDENT A JOIN  STUDENT_STANDINGS B ON (A.STUD_ID=B.STUD_ID) WHERE b.S_ID = $sid and b.class_code = $s_code and b.term = '$t' ";
+                    $showgpa =  oci_parse($conn, "SELECT A.STUD_ID,A.NAME,ROUND(B.AVERAGE,2) AS AVERAGE,c.CLASS_NAME FROM STUDENT A JOIN  STUDENT_STANDINGS B ON (A.STUD_ID=B.STUD_ID) JOIN SUB_CLASS C ON (B.CLASS_CODE=C.SUB_CODE) WHERE b.S_ID = $sid  and b.term = '$t' ORDER BY B.AVERAGE desc ");
                     oci_execute($showgpa);
                             ?>
 
@@ -225,7 +215,8 @@ include('auto_logout.php');
                         <tr style="background-color: #909290; color: #ffffff; text-align: left; font-weight: bold;">
                             <th style="padding: 5px 8px; font-size: 10px; margin: 5px;">Student ID</th>
                             <th style="padding: 5px 8px; font-size: 10px; margin: 5px;">Name</th>
-                            <th style="padding: 5px 8px; font-size: 10px; margin: 5px;">GPA</th>
+                            <th style="padding: 5px 8px; font-size: 10px; margin: 5px;">Class</th>
+                            <th style="padding: 5px 8px; font-size: 10px; margin: 5px;">Average</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -235,7 +226,8 @@ include('auto_logout.php');
                             <tr style="border-bottom: 1px solid #dddddd;">
                                 <td style="padding: 5px 8px; font-size: 10px; margin: 5px;"><?php echo $row['STUD_ID']; ?></td>
                                 <td style="padding: 5px 8px; font-size: 10px; margin: 5px;"><?php echo $row['NAME']; ?></td>
-                                <td style="padding: 5px 8px; font-size: 10px; margin: 5px;"><?php echo $row['GPA'] / 1.00; ?></td>
+                                <td style="padding: 5px 8px; font-size: 10px; margin: 5px;"><?php echo $row['CLASS_NAME']; ?></td>
+                                <td style="padding: 5px 8px; font-size: 10px; margin: 5px;"><?php echo $row['AVERAGE'] ?></td>
                             </tr>
                         <?php
                         }
@@ -244,9 +236,24 @@ include('auto_logout.php');
                 </table>
             </div>
 
-
             <label>Generate Class Standings Report</label>
             <div class="input-field" style="margin-right: 10px;">
+
+                <label>Class</label>
+                <select name="select_class">
+                    <option disabled selected>Select Class</option>
+                    <?php
+                    $get_hos = "select * from CLASS WHERE S_ID= $sid order by class";
+                    $get = oci_parse(oci_connect($username, $password, $connection), $get_hos);
+                    oci_execute($get);
+                    while ($row = oci_fetch_array($get)) {
+                    ?><option>
+                            <?php echo $row["CLASS_TITLE"]; ?>
+                        </option> <?php
+                                }
+                                    ?>
+                </select>
+
                 <label>Report Type</label>
                 <select required name="report_type">
                     <option disabled selected>Select Report Type</option>
@@ -273,71 +280,78 @@ include('auto_logout.php');
                 use PhpOffice\PhpSpreadsheet\Spreadsheet;
                 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
-                $query = "SELECT DISTINCT(A.STUD_ID),A.NAME,B.GPA FROM STUDENT A JOIN  STUDENT_STANDINGS B ON (A.STUD_ID=B.STUD_ID) WHERE b.S_ID = $sid and academic_year = '$a_y'  and  term = '$t' and class_code = $s_code order by b.gpa desc";
                 //  echo  $query;
                 if (isset($_POST['standings'])) {
                     if (isset($_POST['report_type'])) {
-                        $rpt_type = $_POST['report_type'];
-                        if ($rpt_type == 'EXCEL') {
+                     
+                            $class = $_POST['select_class'];
+                          //  echo $_POST['select_class'];
+                            $query = "SELECT DISTINCT(A.STUD_ID),A.NAME,B.AVERAGE AS GPA,C.CLASS_NAME FROM STUDENT A JOIN  STUDENT_STANDINGS B ON (A.STUD_ID=B.STUD_ID) JOIN SUB_CLASS C ON (B.CLASS_CODE=C.SUB_CODE) JOIN CLASS D  ON (C.CLASS=D.CLASS) WHERE b.S_ID = $sid and academic_year = '$a_y'  and  term = '$t' AND D.CLASS_TITLE ='$class'  order by b.average desc";
+                      //        echo $query;
+                            $rpt_type = $_POST['report_type'];
+                            if ($rpt_type == 'EXCEL') {
+                                $class_name = 'AVERAGE   STANDINGS';
+                                $statement = oci_parse($conn, $query);
+                                oci_execute($statement);
+                                $spreadsheet = new Spreadsheet();
+                                $sheet = $spreadsheet->getActiveSheet();
+                                $sheet->setCellValue('A1', 'STUDENT ID');
+                                $sheet->setCellValue('B1', 'STUDENT NAME');
+                                $sheet->setCellValue('C1', 'CLASS NAME');
+                                $sheet->setCellValue('D1', 'AVERAGE');
 
-                            $statement = oci_parse($conn, $query);
-                            oci_execute($statement);
-                            $spreadsheet = new Spreadsheet();
-                            $sheet = $spreadsheet->getActiveSheet();
-                            $sheet->setCellValue('A1', 'STUDENT ID');
-                            $sheet->setCellValue('B1', 'STUDENT NAME');
-                            $sheet->setCellValue('C1', 'GPA');
-
-                            $directoryPath = 'C:\ACADEMIX\\' . $school . '\generated_reports\teacher_class_standings\\';
-                            if (!is_dir($directoryPath)) {
-                                if (!mkdir($directoryPath, 0777, true)) {
-                                    die('Failed to create directories.');
+                                $directoryPath = 'C:\ACADEMIX\\' . $school . '\generated_reports\teacher_class_standings\\';
+                                if (!is_dir($directoryPath)) {
+                                    if (!mkdir($directoryPath, 0777, true)) {
+                                        die('Failed to create directories.');
+                                    }
                                 }
-                            }
-                            $filePath = $directoryPath . $class_name . '.xlsx';
-                            $row = 2;
-                            while ($row_data = oci_fetch_assoc($statement)) {
-                                $sheet->setCellValue('A' . $row, $row_data['STUD_ID']);
-                                $sheet->setCellValue('B' . $row, $row_data['NAME']);
-                                $sheet->setCellValue('C' . $row, $row_data['GPA']);
-                                $row++;
-                            }
-                            $writer = new Xlsx($spreadsheet);
-                            // Output the Excel file
-                            $writer->save($filePath);
-                            $_SESSION['school'] = $school;
-                            $_SESSION['class_name'] = $class_name;
+                                $filePath = $directoryPath . $class_name . '.xlsx';
+                                $row = 2;
+                                while ($row_data = oci_fetch_assoc($statement)) {
+                                    $sheet->setCellValue('A' . $row, $row_data['STUD_ID']);
+                                    $sheet->setCellValue('B' . $row, $row_data['NAME']);
+                                    $sheet->setCellValue('C' . $row, $row_data['CLASS_NAME']);
+                                    $sheet->setCellValue('D' . $row, $row_data['GPA']);
+                                    $row++;
+                                }
+                                $writer = new Xlsx($spreadsheet);
+                                // Output the Excel file
+                                $writer->save($filePath);
+                                $_SESSION['school'] = $school;
+                                $_SESSION['class_name'] = $class_name;
 
-                            $_SESSION['path'] = $filePath;
-                            $_SESSION['file'] = $class_name . '.xlsx';
-                            $_SESSION['redirect'] = 'compile.php';
-                            header('Location: download_excel.php');
-                            /*  $file_path = 'C:\ACADEMIX\KOTU SENIOR SECONDARY SCHOOL\generated_reports\teacher_class_standings\\' . $class_name . '.xlsx';
-
-                            // Ensure the file exists before proceeding
-                            if (file_exists($file_path)) {
-                                header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-                                header("Content-Transfer-Encoding: Binary");
-                                header("Content-disposition: attachment; filename=\"" . basename($file_path) . "\"");
-                            
-                                readfile($file_path);
-                            } else {
-                                echo "File not found: $file_path";
-                            }
-                            
-*/
+                                $_SESSION['path'] = $filePath;
+                                $_SESSION['file'] = $class_name .' FOR '. $class . '.xlsx';
+                                $_SESSION['redirect'] = 'compile.php';
+                                    header('Location: download_excel.php');
+                                /*  $file_path = 'C:\ACADEMIX\KOTU SENIOR SECONDARY SCHOOL\generated_reports\teacher_class_standings\\' . $class_name . '.xlsx';
+    
+                                // Ensure the file exists before proceeding
+                                if (file_exists($file_path)) {
+                                    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                                    header("Content-Transfer-Encoding: Binary");
+                                    header("Content-disposition: attachment; filename=\"" . basename($file_path) . "\"");
+                                
+                                    readfile($file_path);
+                                } else {
+                                    echo "File not found: $file_path";
+                                }
+                                
+    */
                 ?><div style="font-size:15px;
-    color: green;
-    position: relative;
-     display:flex;
-    animation:button .3s linear;text-align: center;">
-                                <?php echo "FILE GENERATED";
-                                header("refresh:2;"); ?>
-                            </div> <?php
-                                    // Close the Oracle connection
-                                    oci_free_statement($statement);
-                                    oci_close($conn);
-                                }
+        color: green;
+        position: relative;
+         display:flex;
+        animation:button .3s linear;text-align: center;">
+                                    <?php echo "FILE GENERATED";
+                                    header("refresh:2;"); ?>
+                                </div> <?php
+                                        // Close the Oracle connection
+                                        oci_free_statement($statement);
+                                        oci_close($conn);
+                                    }
+                                
                             } else {
                                     ?><div style="font-size:15px;
     color: red;
@@ -400,7 +414,7 @@ include('auto_logout.php');
 
                 <button class="backBtn" type="submit">
 
-                    <a class="btnText" href="registra.php">
+                    <a class="btnText" href="select_class_compile.php">
                         BACK
 
                     </a>

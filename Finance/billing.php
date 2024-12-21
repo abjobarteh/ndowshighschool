@@ -175,51 +175,6 @@ include('auto_logout.php');
         }
         ?>
 
-        <div style="display:flex; margin-top:20px;">
-            <Label style="font-size: 18px; font-family: righteous;
-         font-weight: bold; color: #909290;">Student Arrears</Label>
-        </div>
-
-        <div style="overflow-x:auto;">
-            <table class="table-content" style="font-size: 14px; border-collapse: collapse; margin: 10px 0; font: 0.9em; border-radius: 5px 5px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
-                <thead>
-                    <tr style="background-color: #909290; color: #ffffff; text-align: left; font-weight: bold;">
-                        <th style="padding: 5px 8px; font-size: 10px; margin: 5px;">Name</th>
-                        <th style="padding: 5px 8px; font-size: 10px; margin: 5px;">Student ID</th>
-                        <th style="padding: 5px 8px; font-size: 10px; margin: 5px;">Class</th>
-                        <th style="padding: 5px 8px; font-size: 10px; margin: 5px;">Term</th>
-                        <th style="padding: 5px 8px; font-size: 10px; margin: 5px;">Description</th>
-                        <th style="padding: 5px 8px; font-size: 10px; margin: 5px;">Amount</th>
-                        <th style="padding: 5px 8px; font-size: 10px; margin: 5px;">Balance</th>
-                        <th style="padding: 5px 8px; font-size: 10px; margin: 5px;">Billing Date</th>
-                        <th style="padding: 5px 8px; font-size: 10px; margin: 5px;">Billed By</th>
-                    </tr>
-                </thead>
-            </table>
-            <div style="max-height: 200px; overflow-y: auto;">
-                <table class="table-content" style="font-size: 14px; border-collapse: collapse; margin: 0; font: 0.9em; min-width: 400px; border-radius: 5px 5px;">
-                    <tbody>
-                        <?php
-                        while ($row = oci_fetch_array($stid)) {
-                        ?>
-                            <tr style="border-bottom: 1px solid #dddddd;">
-                                <td style="padding: 5px 8px; font-size: 13px; margin: 5px;"><?php echo $row['NAME']; ?></td>
-                                <td style="padding: 5px 8px; font-size: 13px; margin: 5px;"><?php echo $row['STUD_ID']; ?></td>
-                                <td style="padding: 5px 8px; font-size: 13px; margin: 5px;"><?php echo $row['CLASS_NAME']; ?></td>
-                                <td style="padding: 5px 8px; font-size: 13px; margin: 5px;"><?php echo $row['TERM']; ?></td>
-                                <td style="padding: 5px 8px; font-size: 13px; margin: 5px;"><?php echo $row['DESCRIPTION']; ?></td>
-                                <td style="padding: 5px 8px; font-size: 13px; margin: 5px;"><?php echo $row['AMOUNT']; ?></td>
-                                <td style="padding: 5px 8px; font-size: 13px; margin: 5px;"><?php echo $row['BALANCE']; ?></td>
-                                <td style="padding: 5px 8px; font-size: 13px; margin: 5px;"><?php echo $row['BILLING_DT']; ?></td>
-                                <td style="padding: 5px 8px; font-size: 13px; margin: 5px;"><?php echo $row['USERNAME']; ?></td>
-                            </tr>
-                        <?php
-                        }
-                        ?>
-                    </tbody>
-                </table>
-            </div>
-        </div>
 
 
         <div style="display:flex; margin-top:20px;">
@@ -327,6 +282,11 @@ include('auto_logout.php');
                                 }
                                     ?>
                 </select>
+            </div>
+
+            <div class="input-field" style="margin-right: 10px;">
+                <label for="subjectCode">Description</label>
+                <input type="text" placeholder="Enter Description" title="Only Letters" name="des">
             </div>
 
             <div class="input-field" style="margin-right: 10px;">
@@ -607,6 +567,128 @@ include('auto_logout.php');
         }
 
 
+
+        if (isset($_POST['bill'])) {
+            $sub_code = $_SESSION['sub_code'];
+            $inv = $_POST['inv_no'];
+            $des = $_POST['des'];
+            if ($inv != '') {
+                if ($des != '') {
+                    if (isset($_POST['term'])) {
+                        $t = $_POST['term'];
+
+                        $sql = oci_parse($conn, "SELECT * FROM TERM_CALENDAR WHERE TERM = '$t'");
+                        oci_execute($sql);
+                        while ($r = oci_fetch_array($sql)) {
+                            $a_y = $r['ACADEMIC_YEAR'];
+                        }
+                        if (isset($_POST['pyt'])) {
+                            $amt = $_POST['amt'];
+                            if ($amt != "") {
+                                $sql = oci_parse($conn, "SELECT * FROM STUDENT_BILLING WHERE INVOICE_NO = '$inv'");
+                                oci_execute($sql);
+                                if (oci_fetch_all($sql, $a) == 0) {
+
+                                    $st = $_POST['pyt'];
+                                    $sql = oci_parse($conn, "SELECT * FROM STUDENT WHERE STUD_ID = '$st' ");
+                                    oci_execute($sql);
+                                    while ($r = oci_fetch_array($sql)) {
+                                        $name = $r['NAME'];
+                                    }
+
+                                    $des = strtoupper($des);
+
+                                    // echo "INSERT INTO STUDENT_BILLING (INVOICE_NO,ACADEMIC_YEAR,TERM,CLASS_CODE,DESCRIPTION,AMOUNT,BALANCE,BILLING_DT,USERNAME,STUD_ID) VALUES 
+                                    //        ('$inv','$a_y','$t',$sub_code,'$des',$amt,$amt,SYSTDATE,'$user','$st')";
+
+                                    $sql = oci_parse($conn, "INSERT INTO STUDENT_BILLING (INVOICE_NO,ACADEMIC_YEAR,TERM,CLASS_CODE,DESCRIPTION,AMOUNT,BALANCE,BILLING_DT,USERNAME,STUD_ID) VALUES 
+                                        ('$inv','$a_y','$t',$sub_code,'$des',$amt,$amt,SYSDATE,'$user','$st')");
+                                    if (oci_execute($sql)) {
+
+                                        echo  '<script>
+                                            Swal.fire({
+                                                position: "center",
+                                                icon: "success",
+                                                title: "STUDENT SUCESSFULLY BILLED FOR THIS TERM",
+                                                showConfirmButton: false,
+                                                timer: 1500
+                                              });
+                                            </script>';
+                                        header("refresh:2;");
+                                    }
+                                } else {
+                                    echo  '<script>
+                                    Swal.fire({
+                                        position: "center",
+                                        icon: "warning",
+                                        title: "STUDENT BILLED WITH THIS INOVICE NUMBER",
+                                        showConfirmButton: false,
+                                        timer: 1500
+                                      });
+                                    </script>';
+                                    header("refresh:2;");
+                                }
+                            } else {
+                                echo  '<script>
+                                    Swal.fire({
+                                        position: "center",
+                                        icon: "warning",
+                                        title: "ENTER AMT",
+                                        showConfirmButton: false,
+                                        timer: 1500
+                                      });
+                                    </script>';
+                                header("refresh:2;");
+                            }
+                        } else {
+                            echo  '<script>
+                            Swal.fire({
+                                position: "center",
+                                icon: "warning",
+                                title: "SELECT STUDENT",
+                                showConfirmButton: false,
+                                timer: 1500
+                              });
+                            </script>';
+                            header("refresh:2;");
+                        }
+                    } else {
+                        echo  '<script>
+                        Swal.fire({
+                            position: "center",
+                            icon: "warning",
+                            title: "SELECT TERM",
+                            showConfirmButton: false,
+                            timer: 1500
+                          });
+                        </script>';
+                        header("refresh:2;");
+                    }
+                } else {
+                    echo  '<script>
+                    Swal.fire({
+                        position: "center",
+                        icon: "warning",
+                        title: "ENTER DESCRIPTION",
+                        showConfirmButton: false,
+                        timer: 1500
+                      });
+                    </script>';
+                    header("refresh:2;");
+                }
+            } else {
+                echo  '<script>
+                Swal.fire({
+                    position: "center",
+                    icon: "warning",
+                    title: "ENTER INVOICE NUMBER",
+                    showConfirmButton: false,
+                    timer: 1500
+                  });
+                </script>';
+                header("refresh:2;");
+            }
+        }
         /*  if (isset($_POST['update'])) {
 
             $stuid = $_SESSION['id'];
@@ -755,51 +837,17 @@ include('auto_logout.php');
             }
         } */
         ?>
-            <div class="input-container" style="display: flex;">
-            <div class="input-field" style="margin-right: 10px;">
-                <label for="subjectCode">Report Type</label>
-                <select required name="type">
-                    <option disabled selected>Select Report Type</option>
-                    <option>PDF</option>
-                    <option>EXCEL</option>
-                </select>
-            </div>
-            <select required name="class_name">
-                <option disabled selected>Select Class</option>
-                <?php
-                $get_hos = "SELECT DISTINCt(B.CLASS_NAME),A.SUB_CODE FROM CLASS_STUDENT A JOIN SUB_CLASS B ON (A.SUB_CODE=B.SUB_CODE) ORDER BY B.CLASS_NAME ";
-                $get = oci_parse(oci_connect($username, $password, $connection), $get_hos);
-                oci_execute($get);
-                while ($row = oci_fetch_array($get)) {
-                ?><option value="<?php echo $row['SUB_CODE'] ?>">
-                        <?php echo trim($row["CLASS_NAME"]); ?>
-                    </option> <?php
-                            }
-                                ?>
-            </select>
             
-        </div>
-        <button style=" display: inline-block;
-  padding: 6px 12px;
-  background-color: #909290;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  margin-top:10px;
-  margin-bottom:10px;
-  text-decoration: none;" name="generate_arrearlist" type="submit">
-            GENERATE STUDENT ARREARS LIST
-            <i class="uil uil-file-export"></i>
-        </button>
+       
  
         <?php
 
         require('tcpdf/tcpdf.php');
         require '../vendor/autoload.php';
 
-        require 'C:\wamp64\www\Academix\NDOWS\Registra\PHPMailer.php';
-        require 'C:\wamp64\www\Academix\NDOWS\Registra\Exception.php';
-        require 'C:\wamp64\www\Academix\NDOWS\Registra\SMTP.php';
+        require 'D:\Junior\Registra\PHPMailer.php';
+        require 'D:\Junior\Registra\Exception.php';
+        require 'D:\Junior\Registra\SMTP.php';
 
         use PhpOffice\PhpSpreadsheet\Spreadsheet;
         use PhpOffice\PhpSpreadsheet\Writer\Xlsx;

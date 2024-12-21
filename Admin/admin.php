@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Registra Dashboard</title>
+    <title>Principal/Administrator Dashboard</title>
     <!-- update css path -->
     <link rel="stylesheet" href="css/menu.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
@@ -16,21 +16,7 @@ session_start();
 $school =  $_SESSION['school'];
 $sid = $_SESSION['sid'];
 ?>
- <style>
-            .card {
-                background-color: #909290;
-                border-radius: 10px;
-                padding: 20px;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-                margin: 20px;
-            }
 
-            .card h2 {
-                color: white;
-                text-align: center;
-                font-size: 25px;
-            }
-        </style>
 <body>
     <?php
     // Include the auto_logout.php file
@@ -198,6 +184,9 @@ $sid = $_SESSION['sid'];
                         <li class="item">
                             <a href="student_pay.php">Student Payment</a>
                         </li>
+                        <li class="item">
+                            <a href="arrears.php">Student Arrears</a>
+                        </li>
 
                     </ul>
                 </li>
@@ -232,7 +221,9 @@ $sid = $_SESSION['sid'];
                         <li class="item">
                             <a href="select_subject_marks.php">Show Student Grade</a>
                         </li>
-
+                        <li class="item">
+                            <a href="select_mark_approval.php">Mark Approval</a>
+                        </li>
                         <li class="item">
                             <a href="select_cumulate.php">Student Grade</a>
                         </li>
@@ -272,14 +263,28 @@ $sid = $_SESSION['sid'];
                                                                                                                                                                                             }
                                                                                                                                                                                                 ?>
 
-      
+
+        <?php echo  ' <style>
+                       .card {
+                           background-color: #909290;
+                           border-radius: 10px;
+                           padding: 20px;
+                           box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                           margin: 20px;
+                       }
+                       .card h2 {
+                           color: white;
+                           text-align: center;
+                           font-size: 25px;
+                       }
+                   </style>';   ?>
         <div class="card">
             <h2>Academic Year</h2>
             <?php
-            $sql = oci_parse($conn, "select * from academic_calendar  where s_id = $sid and start_dt is not null and end_dt is not null ");
+            $sql = oci_parse($conn, "select * from academic_calendar  where s_id = 3 and status ='ACCEPTED' ");
             oci_execute($sql);
             if (oci_fetch_all($sql, $a) > 0) {
-                $sql = oci_parse($conn, "select CEIL(TO_DATE(END_DT, 'YYYY-MM-DD') - SYSDATE) AS DAYS_BETWEEN ,START_DT,END_DT,ACADEMIC_YEAR from academic_calendar where s_id = $sid and start_dt is not null and end_dt is not null order by academic_year");
+                $sql = oci_parse($conn, "select CEIL(TO_DATE(END_DT, 'YYYY-MM-DD') - SYSDATE) AS DAYS_BETWEEN ,START_DT,END_DT,ACADEMIC_YEAR from academic_calendar where s_id = $sid and status ='ACCEPTED' order by academic_year");
                 oci_execute($sql);
                 if ($r = oci_fetch_array($sql)) {
                     $start_dt = $r['START_DT'];
@@ -305,10 +310,10 @@ $sid = $_SESSION['sid'];
         <div class="card">
             <h2>Term</h2>
             <?php
-            $sql = oci_parse($conn, "select * from term_calendar  where s_id = $sid and start_dt is not null and end_dt is not null ");
+            $sql = oci_parse($conn, "select * from term_calendar  where s_id = $sid and status ='ACCEPTED' ");
             oci_execute($sql);
             if (oci_fetch_all($sql, $a) > 0) {
-                $sql = oci_parse($conn, "select CEIL(TO_DATE(END_DT, 'YYYY-MM-DD') - SYSDATE) AS DAYS_BETWEEN ,START_DT,END_DT,TERM from term_calendar where s_id = $sid and start_dt is not null and end_dt is not null order by term desc");
+                $sql = oci_parse($conn, "select CEIL(TO_DATE(END_DT, 'YYYY-MM-DD') - SYSDATE) AS DAYS_BETWEEN ,START_DT,END_DT,TERM from term_calendar where s_id = $sid and status ='ACCEPTED' order by term desc");
                 oci_execute($sql);
                 if ($r = oci_fetch_array($sql)) {
                     $start_dt = $r['START_DT'];

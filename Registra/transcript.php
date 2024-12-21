@@ -19,6 +19,7 @@
     include('connect.php');
     $school =  $_SESSION['school'];
     $sid = $_SESSION['sid'];
+    $stu_name=$_SESSION['student_name']
     ?>
     <title>Transcript</title>
 </head>
@@ -84,30 +85,30 @@
 
 <body>
     <div class="container">
-    <div class="com" style="
+        <div class="com" style="
     vertical-align: middle;
     text-align: center;
     justify-content: center;
     align-items: center;">
-      <h3 class="title" style="justify-content:center; text-align:center; color:#909290; 	font-size: 18px;">Welcome To Academix
-      </h3>
-      <h3 class="title" style="justify-content:center; text-align:center; color:#909290; 	font-size: 18px;"><?php echo $school ?>
-      </h3>
-      <?php
-      $stmt = oci_parse($conn, "select * from school where school = :name");
-      oci_bind_by_name($stmt, ':name', $school);
-      oci_execute($stmt);
-      if ($rowS = oci_fetch_array($stmt)) {
-        $imageData = $rowS['LOGO']->load(); // Load OCILob data
+            <h3 class="title" style="justify-content:center; text-align:center; color:#909290; 	font-size: 18px;">Welcome To Academix
+            </h3>
+            <h3 class="title" style="justify-content:center; text-align:center; color:#909290; 	font-size: 18px;"><?php echo $school ?>
+            </h3>
+            <?php
+            $stmt = oci_parse($conn, "select * from school where school = :name");
+            oci_bind_by_name($stmt, ':name', $school);
+            oci_execute($stmt);
+            if ($rowS = oci_fetch_array($stmt)) {
+                $imageData = $rowS['LOGO']->load(); // Load OCILob data
 
-        // Encode the image data as base64
-        $base64Image = base64_encode($imageData);
-      ?> <td style=" padding: 5px 8px; font-size: 10px; margin: 5px; align-items: center;"><?php
+                // Encode the image data as base64
+                $base64Image = base64_encode($imageData);
+            ?> <td style=" padding: 5px 8px; font-size: 10px; margin: 5px; align-items: center;"><?php
 
-                                                                        echo '<img src="data:image/png;base64,' . $base64Image . '" alt="Image" style="width: 100px; height: 100px;">'; ?></td> <?php
-                                                                                                                                                              }
-                                                                                                                                                                ?>
-    </div>
+                                                                                            echo '<img src="data:image/png;base64,' . $base64Image . '" alt="Image" style="width: 100px; height: 100px;">'; ?></td> <?php
+                                                                                                                                                                                            }
+                                                                                                                                                                                                ?>
+        </div>
         <div class="buttons">
             <button class="backBtn" style="width: 150px;">
                 <a class="btnText" href="registra" style="font-size: 15px; color: white; text-decoration: none;">
@@ -135,7 +136,7 @@
                                 <select name="select_exist_student" required>
                                     <option disabled selected>Select Student</option>
                                     <?php
-                                    $sql = oci_parse($conn, "SELECT * FROM STUDENT ORDER BY NAME");
+                                    $sql = oci_parse($conn, "SELECT * FROM STUDENT WHERE NAME LIKE '%$stu_name%' ORDER BY NAME");
                                     oci_execute($sql);
                                     while ($row = oci_fetch_array($sql)) {
                                         echo '<option value="' . $row["STUD_ID"] . '">' . strtoupper($row["NAME"]) . ' ' . strtoupper($row['STUD_ID']) . '</option>';
@@ -222,7 +223,7 @@
                                 <select name="select_existstudent" required>
                                     <option disabled selected>Select Student</option>
                                     <?php
-                                    $sql = oci_parse($conn, "SELECT * FROM STUDENT ORDER BY NAME");
+                                    $sql = oci_parse($conn, "SELECT * FROM STUDENT WHERE NAME LIKE '%$stu_name%' ORDER BY NAME");
                                     oci_execute($sql);
                                     while ($row = oci_fetch_array($sql)) {
                                         echo '<option value="' . $row["STUD_ID"] . '">' . strtoupper($row["NAME"]) . ' ' . strtoupper($row['STUD_ID']) . '</option>';
@@ -278,7 +279,7 @@
                         <select name="student" required style="width: 400px; max-width: 100%;">
                             <option disabled selected>Select Student</option>
                             <?php
-                            $sql = oci_parse($conn, "SELECT * FROM STUDENT ORDER BY NAME");
+                            $sql = oci_parse($conn, "SELECT * FROM STUDENT WHERE NAME LIKE '%$stu_name%' ORDER BY NAME");
                             oci_execute($sql);
                             while ($row = oci_fetch_array($sql)) {
                                 echo '<option value="' . $row["STUD_ID"] . '">' . strtoupper($row["NAME"]) . ' ' . strtoupper($row['STUD_ID']) . '</option>';
@@ -731,9 +732,13 @@
                             $classTitle = $responsibilityRow['CLASS_TITLE'];
                             $html .= "<p><strong>$classTitle:</strong> $responsibility</p>";
                         }
-
+                        $comments = strtoupper($_POST['comments']);
                         $html .= <<<HTML
                                         </p>
+                                        <div class="principal-comment-signature">
+                                        <h3>Principal's Comments:</h3>
+                                        <p>$comments</p>
+
                                         <div class="principal-comment-signature">
                             <h3>Principal's Signature:</h3>
                             <p>___________________</p>

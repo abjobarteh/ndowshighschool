@@ -417,9 +417,9 @@ include('auto_logout.php');
         require('tcpdf/tcpdf.php');
         require '../vendor/autoload.php';
 
-        require 'C:\wamp64\www\Academix\NDOWS\Registra\PHPMailer.php';
-        require 'C:\wamp64\www\Academix\NDOWS\Registra\Exception.php';
-        require 'C:\wamp64\www\Academix\NDOWS\Registra\SMTP.php';
+        require 'D:\Junior\Registra\PHPMailer.php';
+        require 'D:\Junior\Registra\Exception.php';
+        require 'D:\Junior\Registra\SMTP.php';
 
         use PhpOffice\PhpSpreadsheet\Spreadsheet;
         use PhpOffice\PhpSpreadsheet\Writer\Xlsx;

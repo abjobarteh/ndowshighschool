@@ -7,7 +7,7 @@ $filename = $_GET['filename'];
 
 
 // Set the appropriate headers for PDF download
-header('Content-Type: application/pdf');
+header('Content-Type: application/jpg');
 header('Content-Disposition: attachment; filename="' . basename($filename) . '"');
 header('Content-Length: ' . filesize($filename));
 

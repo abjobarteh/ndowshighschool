@@ -71,7 +71,7 @@ $emp_id = $_SESSION['emp_id'];
               $sql = oci_parse($conn, "select *  from grade where grade = '$grade' ");
               oci_execute($sql);
               if (oci_fetch_all($sql, $a) == 0) {
-                $sql = oci_parse($conn, "INSERT INTO GRADE (GRADE,S_ID) VALUES ('$grade',$sid)");
+                $sql = oci_parse($conn, "INSERT INTO GRADE (GRADE,S_ID,INTERPRETATION) VALUES ('$grade',$sid,'$gr_in')");
                 if (oci_execute($sql)) {
         ?><div style="font-size:15px;
                   color: green;

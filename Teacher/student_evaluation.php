@@ -86,7 +86,8 @@ include('auto_logout.php');
         <div class="input-field">
             <?php
 
-$sql = oci_parse($conn, "select * from academic_calendar a join term_calendar b on (a.academic_year=b.academic_year) where b.start_dt is not null order by b.term desc");
+$term=$_SESSION['term'] ;
+$sql = oci_parse($conn, "select * from academic_calendar a join term_calendar b on (a.academic_year=b.academic_year) where b.term='$term' order by b.term desc");
 oci_execute($sql);
 if ($row = oci_fetch_array($sql)) {
     $a_y = $row['ACADEMIC_YEAR'];
@@ -102,7 +103,7 @@ if ($row = oci_fetch_array($sql)) {
               and se.academic_year = '$a_y' and se.term = '$t'
             ) order by a.name
           ";
-       // echo $get_hos;
+        //echo $get_hos;
           $get = oci_parse(oci_connect($username, $password, $connection), $get_hos);
           oci_execute($get);
           if($row =  oci_fetch_array($get)){
@@ -116,7 +117,7 @@ if ($row = oci_fetch_array($sql)) {
                 }
             ?>
                     <label>Student ID</label>
-                    <input type="text" placeholder="<?php echo $stud_id ?>" style="width:100px;" readonly>
+                    <input type="text" placeholder="<?php echo $stud_id ?>" style="width:300px;" readonly>
 
         </div>
 

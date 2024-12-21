@@ -10,7 +10,7 @@ $redirect=$_SESSION['redirect'];
 
 // Set the appropriate headers for PDF download
 
-header('Content-Type: application/pdf');
+header('Content-Type: application/jpg');
 header('Content-Disposition: attachment; filename="' . $filename . '"');
 header('Content-Length: ' . filesize($filePath));
 

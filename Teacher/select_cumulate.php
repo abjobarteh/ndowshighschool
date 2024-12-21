@@ -62,6 +62,25 @@ include('auto_logout.php');
                       ?>
         </select>
       </div>
+      <div class="input-box">
+        <select required name="term">
+          <option disabled selected>Select Term</option>
+          <?php
+          $get_hos = "select DISTINCT(C.TERM) from academic_calendar a join term_calendar b on (a.academic_year=b.academic_year) JOIN STUDENT_EVALUATION C ON (B.TERM=C.TERM) ORDER BY C.TERM";
+          $conn = oci_connect($username, $password, $connection);
+          $get = oci_parse($conn, $get_hos);
+          oci_execute($get);
+          while ($row = oci_fetch_array($get, OCI_ASSOC)) {
+          ?>
+            <option>
+              <?php echo $row["TERM"]; ?>
+            </option>
+          <?php
+          }
+
+          ?>
+        </select>
+      </div>
       <button class="input-box button">
         <input type="Submit" value="Continue" name="change" required>
       </button>
@@ -73,57 +92,69 @@ include('auto_logout.php');
         include 'connect.php';
         if (isset($_POST['change'])) {
           if (isset($_POST['subject'])) {
-            $classValue = $_POST['subject'];
-
-            // If $row['CLASS_NAME'] is in the format "ClassName (AdditionalInfo)"
-            // You can use the following code to extract the value within parentheses
-            // If $classValue is in the format "Subject (ClassName)"
-            if (strpos($classValue, '(') !== false && strpos($classValue, ')') !== false) {
-              $startPos = strpos($classValue, '(') + 1;
-              $endPos = strpos($classValue, ')', $startPos);
-              $className = substr($classValue, $startPos, $endPos - $startPos);
-              $subject = rtrim(substr($classValue, 0, $startPos - 1)); // Remove trailing space from subject
-            } else {
-              // If there are no parentheses, use the entire value as subject
-              $subject = $classValue;
-              $className = ''; // No class name
-            }
-//echo  "select a.SUB_CODE,c.S_CODE from waec_subject a join teacher_subject c on (a.sub_code=c.sub_code) join sub_class d on (c.s_code=d.sub_code) where c.emp_id= $emp_id and a.subject = '$subject' and d.class_name = '$className' ";
-            $sql = oci_parse($conn, "select a.SUB_CODE,c.S_CODE from waec_subject a join teacher_subject c on (a.sub_code=c.sub_code) join sub_class d on (c.s_code=d.sub_code) where c.emp_id= $emp_id and a.subject = '$subject' and d.class_name = '$className' ");
-            oci_execute($sql);
-            while ($r = oci_fetch_array($sql)) {
-              $s_code  = $r["S_CODE"];
-              $sub_code = $r['SUB_CODE'];
-            }
-            $sql = oci_parse($conn, "select class_name from sub_class where sub_code = $s_code ");
-            oci_execute($sql);
-            while ($r = oci_fetch_array($sql)) {
-              $class_name = $r["CLASS_NAME"];
-            }
-            $_SESSION['s_code'] = $s_code;
-            $_SESSION['sub_code'] = $sub_code;
-            $_SESSION['class_name'] = $class_name;
-            $_SESSION['subject'] = $subject;
+            if (isset($_POST['term'])) {
+              $classValue = $_POST['subject'];
+$term = $_POST['term'];
+              // If $row['CLASS_NAME'] is in the format "ClassName (AdditionalInfo)"
+              // You can use the following code to extract the value within parentheses
+              // If $classValue is in the format "Subject (ClassName)"
+              if (strpos($classValue, '(') !== false && strpos($classValue, ')') !== false) {
+                $startPos = strpos($classValue, '(') + 1;
+                $endPos = strpos($classValue, ')', $startPos);
+                $className = substr($classValue, $startPos, $endPos - $startPos);
+                $subject = rtrim(substr($classValue, 0, $startPos - 1)); // Remove trailing space from subject
+              } else {
+                // If there are no parentheses, use the entire value as subject
+                $subject = $classValue;
+                $className = ''; // No class name
+              }
+              //echo  "select a.SUB_CODE,c.S_CODE from waec_subject a join teacher_subject c on (a.sub_code=c.sub_code) join sub_class d on (c.s_code=d.sub_code) where c.emp_id= $emp_id and a.subject = '$subject' and d.class_name = '$className' ";
+              $sql = oci_parse($conn, "select a.SUB_CODE,c.S_CODE from waec_subject a join teacher_subject c on (a.sub_code=c.sub_code) join sub_class d on (c.s_code=d.sub_code) where c.emp_id= $emp_id and a.subject = '$subject' and d.class_name = '$className' ");
+              oci_execute($sql);
+              while ($r = oci_fetch_array($sql)) {
+                $s_code  = $r["S_CODE"];
+                $sub_code = $r['SUB_CODE'];
+              }
+              $sql = oci_parse($conn, "select class_name from sub_class where sub_code = $s_code ");
+              oci_execute($sql);
+              while ($r = oci_fetch_array($sql)) {
+                $class_name = $r["CLASS_NAME"];
+              }
+              $_SESSION['s_code'] = $s_code;
+              $_SESSION['sub_code'] = $sub_code;
+              $_SESSION['class_name'] = $class_name;
+              $_SESSION['subject'] = $subject;
+              $_SESSION['term']=$term;
         ?><div style="font-size:15px;
-                    color: green;
-                    position: relative;
-                     display:flex;
-                    animation:button .3s linear;text-align: center;">
-            <?php echo "STUDENT MARKS FOR $class_name TAKING $subject ";
-            header("refresh:2;url=cumulate_mark.php"); 
-          } else {
-            ?><div style="font-size:15px;
+                      color: green;
+                      position: relative;
+                       display:flex;
+                      animation:button .3s linear;text-align: center;">
+              <?php echo "STUDENT MARKS FOR $class_name TAKING $subject ";
+              header("refresh:2;url=cumulate_mark.php");
+            } else {
+              ?><div style="font-size:15px;
+              color: red;
+              position: relative;
+               display:flex;
+              animation:button .3s linear;text-align: center;">
+                  <?php echo "SELECT TERM";
+                  header("refresh:2;"); ?>
+                </div> <?php
+                      }
+                    } else {
+                        ?><div style="font-size:15px;
                     color: red;
                     position: relative;
                      display:flex;
                     animation:button .3s linear;text-align: center;">
                 <?php echo "SELECT SUBJECT";
-                header("refresh:2;"); ?>
+                      header("refresh:2;"); ?>
               </div> <?php
                     }
                   }
                       ?>
-            </div>
+              </div>
     </form>
   </div>
 </body>

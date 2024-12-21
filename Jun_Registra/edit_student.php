@@ -20,12 +20,12 @@ include 'connect.php'; ?>
 <style>
     .field select:focus {
         padding-left: 47px;
-        border: 2px solid #1D5B79;
+        border: 2px solid #909290;
         background-color: #ffffff;
     }
 
     .field select:focus~i {
-        color: #1D5B79;
+        color: #909290;
     }
 </style>
 
@@ -36,8 +36,8 @@ include('auto_logout.php');
 
     <form class="container" enctype="multipart/form-data" action="edit_student.php" method="post">
         <div class="com">
-            <h3 style="color:#1D5B79;">Academix: School Management System</h3>
-            <h3 class="title" style="justify-content:center; text-align:center; color:#1D5B79; 	font-size: 18px;"><?php echo $school ?>
+            <h3 style="color:#909290;">Academix: School Management System</h3>
+            <h3 class="title" style="justify-content:center; text-align:center; color:#909290; 	font-size: 18px;"><?php echo $school ?>
                 </h2>
                 <?php
                 $stmt = oci_parse($conn, "select * from school where school = :name");
@@ -79,7 +79,7 @@ include('auto_logout.php');
         </div>
         <button style=" display: inline-block;
   padding: 6px 12px;
-  background-color: #1D5B79;
+  background-color: #909290;
   color: white;
   border: none;
   border-radius: 4px;
@@ -142,7 +142,7 @@ include('auto_logout.php');
                     ?>
         <div style="display:flex; margin-top:20px;">
             <Label style="font-size: 18px; font-family: righteous;
-         font-weight: bold; color: #1D5B79;">Student Information</Label>
+         font-weight: bold; color: #909290;">Student Information</Label>
         </div>
         <table class="table-content" style="  font-size: 14px;
     border-collapse: collapse;
@@ -153,7 +153,7 @@ include('auto_logout.php');
     overflow: hidden;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
             <thead>
-                <tr style="  background-color: #1D5B79;
+                <tr style="  background-color: #909290;
     color: #ffffff;
     text-align: left;
     font-weight: bold;">
@@ -246,7 +246,7 @@ include('auto_logout.php');
         <div style="display: flex;">
             <button style=" display: inline-block;
   padding: 6px 12px;
-  background-color: #1D5B79;
+  background-color: #909290;
   color: white;
   border: none;
   border-radius: 4px;
@@ -348,7 +348,7 @@ include('auto_logout.php');
                     ?>
         <div style="display:flex; margin-top:20px;">
             <Label style="font-size: 18px; font-family: righteous;
-         font-weight: bold; color: #1D5B79;">Personal Information</Label>
+         font-weight: bold; color: #909290;">Personal Information</Label>
         </div>
         <table class="table-content" style="  font-size: 14px;
     border-collapse: collapse;
@@ -359,7 +359,7 @@ include('auto_logout.php');
     overflow: hidden;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
             <thead>
-                <tr style="  background-color: #1D5B79;
+                <tr style="  background-color: #909290;
     color: #ffffff;
     text-align: left;
     font-weight: bold;">
@@ -736,7 +736,7 @@ include('auto_logout.php');
         <div style="display: flex;">
             <button style=" display: inline-block;
   padding: 6px 12px;
-  background-color: #1D5B79;
+  background-color: #909290;
   color: white;
   border: none;
   border-radius: 4px;
@@ -1108,7 +1108,7 @@ include('auto_logout.php');
                     ?>
         <div style="display:flex; margin-top:20px;">
             <Label style="font-size: 18px; font-family: righteous;
-         font-weight: bold; color: #1D5B79;">Contact Information</Label>
+         font-weight: bold; color: #909290;">Contact Information</Label>
         </div>
         <table class="table-content" style="  font-size: 14px;
     border-collapse: collapse;
@@ -1119,7 +1119,7 @@ include('auto_logout.php');
     overflow: hidden;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
             <thead>
-                <tr style="  background-color: #1D5B79;
+                <tr style="  background-color: #909290;
     color: #ffffff;
     text-align: left;
     font-weight: bold;">
@@ -1236,7 +1236,7 @@ include('auto_logout.php');
         <div style="display: flex;">
             <button style=" display: inline-block;
   padding: 6px 12px;
-  background-color: #1D5B79;
+  background-color: #909290;
   color: white;
   border: none;
   border-radius: 4px;
@@ -1446,7 +1446,7 @@ include('auto_logout.php');
 
         <div style="display:flex; margin-top:20px;">
             <Label style="font-size: 18px; font-family: righteous;
-         font-weight: bold; color: #1D5B79;">Parent/Guardian Information</Label>
+         font-weight: bold; color: #909290;">Parent/Guardian Information</Label>
         </div>
         <table class="table-content" style="  font-size: 14px;
     border-collapse: collapse;
@@ -1457,7 +1457,7 @@ include('auto_logout.php');
     overflow: hidden;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
             <thead>
-                <tr style="  background-color: #1D5B79;
+                <tr style="  background-color: #909290;
     color: #ffffff;
     text-align: left;
     font-weight: bold;">
@@ -1662,7 +1662,7 @@ include('auto_logout.php');
         <div style="display: flex;">
             <button style=" display: inline-block;
   padding: 6px 12px;
-  background-color: #1D5B79;
+  background-color: #909290;
   color: white;
   border: none;
   border-radius: 4px;
@@ -2070,7 +2070,7 @@ include('auto_logout.php');
                     ?>
         <div style="display:flex; margin-top:20px;">
             <Label style="font-size: 18px; font-family: righteous;
-         font-weight: bold; color: #1D5B79;">Medical Information</Label>
+         font-weight: bold; color: #909290;">Medical Information</Label>
         </div>
         <table class="table-content" style="  font-size: 14px;
     border-collapse: collapse;
@@ -2081,7 +2081,7 @@ include('auto_logout.php');
     overflow: hidden;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
             <thead>
-                <tr style="  background-color: #1D5B79;
+                <tr style="  background-color: #909290;
     color: #ffffff;
     text-align: left;
     font-weight: bold;">
@@ -2181,7 +2181,7 @@ include('auto_logout.php');
         <div style="display: flex;">
             <button style=" display: inline-block;
   padding: 6px 12px;
-  background-color: #1D5B79;
+  background-color: #909290;
   color: white;
   border: none;
   border-radius: 4px;
@@ -2337,7 +2337,7 @@ include('auto_logout.php');
                     ?>
         <div style="display:flex; margin-top:20px;">
             <Label style="font-size: 18px; font-family: righteous;
-         font-weight: bold; color: #1D5B79;">Academic Information</Label>
+         font-weight: bold; color: #909290;">Academic Information</Label>
         </div>
         <table class="table-content" style="  font-size: 14px;
     border-collapse: collapse;
@@ -2348,7 +2348,7 @@ include('auto_logout.php');
     overflow: hidden;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
             <thead>
-                <tr style="  background-color: #1D5B79;
+                <tr style="  background-color: #909290;
     color: #ffffff;
     text-align: left;
     font-weight: bold;">
@@ -2444,7 +2444,7 @@ include('auto_logout.php');
         <div style="display: flex;">
             <button style=" display: inline-block;
   padding: 6px 12px;
-  background-color: #1D5B79;
+  background-color: #909290;
   color: white;
   border: none;
   border-radius: 4px;
@@ -2580,7 +2580,7 @@ include('auto_logout.php');
 
         <div style="display:flex; margin-top:20px;">
             <Label style="font-size: 18px; font-family: righteous;
-         font-weight: bold; color: #1D5B79;">Student Documentation</Label>
+         font-weight: bold; color: #909290;">Student Documentation</Label>
         </div>
  <div class="input-container" style="display: flex;">
 
@@ -2634,7 +2634,7 @@ include('auto_logout.php');
         <div style="display: flex;">
             <button style=" display: inline-block;
   padding: 6px 12px;
-  background-color: #1D5B79;
+  background-color: #909290;
   color: white;
   border: none;
   border-radius: 4px;

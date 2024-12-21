@@ -265,7 +265,7 @@ include('auto_logout.php');
             <select required name="report_type">
                 <option disabled selected>Select Report Type</option>
                 <option>PDF</option>
-            
+                <option>EXCEL</option>
             </select>
             <label>Class Name</label>
             <select required name="class_name">
@@ -593,31 +593,31 @@ include('auto_logout.php');
                                             }
                                             if (isset($_POST['gender'])) {
                                                 $gender = $_POST['gender'];
-                                                $query = "SELECT DISTINCT(A.STUD_ID),B.FIRSTNAME,B.MIDDLENAME,B.LASTNAME FROM STUDENT A JOIN STUDENT_PERSONAL B ON(A.STUD_ID=B.STUD_ID) JOIN CLASS_STUDENT C ON (A.STUD_ID=C.STUD_ID) WHERE C.SUB_CODE = $sub_code and c.s_id = $sid and b.gender ='$gender' ORDER  BY  A.STUD_ID";
+                                                $query = "SELECT DISTINCT(A.STUD_ID),B.FIRSTNAME,B.MIDDLENAME,B.LASTNAME FROM STUDENT A JOIN STUDENT_PERSONAL B ON(A.STUD_ID=B.STUD_ID) JOIN CLASS_STUDENT C ON (A.STUD_ID=C.STUD_ID) WHERE C.SUB_CODE = $sub_code and c.s_id = $sid and b.gender ='$gender' ORDER  BY  B.LASTNAME";
                                                 // Prepare and execute the query
                                                 $statement = oci_parse($conn, $query);
                                                 oci_execute($statement);
                                                 $spreadsheet = new Spreadsheet();
                                                 $sheet = $spreadsheet->getActiveSheet();
                                                 $sheet->setCellValue('A1', 'STUDENT ID');
-                                                $sheet->setCellValue('B1', 'FIRSTNAME');
+                                                $sheet->setCellValue('B1', 'LASTNAME');
                                                 $sheet->setCellValue('C1', 'MIDDLENAME');
-                                                $sheet->setCellValue('D1', 'LASTNAME');
+                                                $sheet->setCellValue('D1', 'FIRSTNAME');
                                                 $directoryPath = 'C:\ACADEMIX\\' . $school . '\generated_reports\class_list\\';
                                                 if (!is_dir($directoryPath)) {
                                                     if (!mkdir($directoryPath, 0777, true)) {
                                                         die('Failed to create directories.');
                                                     }
                                                 }
-                                                $filePath = $directoryPath . 'class.xlsx';
+                                                $filePath = $directoryPath .'CLASS LIST FOR '. $class_name.'.xlsx';
 
 
                                                 $row = 2;
                                                 while ($row_data = oci_fetch_assoc($statement)) {
                                                     $sheet->setCellValue('A' . $row, $row_data['STUD_ID']);
-                                                    $sheet->setCellValue('B' . $row, $row_data['FIRSTNAME']);
+                                                    $sheet->setCellValue('B' . $row, $row_data['LASTNAME']);
                                                     $sheet->setCellValue('C' . $row, $row_data['MIDDLENAME']);
-                                                    $sheet->setCellValue('D' . $row, $row_data['LASTNAME']);
+                                                    $sheet->setCellValue('D' . $row, $row_data['FIRSTNAME']);
                                                     $row++;
                                                 }
 
@@ -626,9 +626,9 @@ include('auto_logout.php');
                                                 // Output the Excel file
                                                 $writer->save($filePath);
                                                 $_SESSION['path'] = $filePath;
-                                                $_SESSION['file'] = 'class.xlsx';
+                                                $_SESSION['file'] = 'CLASS LIST FOR '. $class_name.'.xlsx';
                                                 $_SESSION['redirect']='show_class.php';
-                                                header('Location: download_excels.php');
+                                                header('Location: download_excel.php');
                                             ?><div style="font-size:15px;
                                 color: green;
                                 position: relative;
@@ -641,39 +641,39 @@ include('auto_logout.php');
                                                 oci_free_statement($statement);
                                                 oci_close($conn);
                                             } else {
-                                                $query = "SELECT DISTINCT(A.STUD_ID),B.FIRSTNAME,B.MIDDLENAME,B.LASTNAME FROM STUDENT A JOIN STUDENT_PERSONAL B ON(A.STUD_ID=B.STUD_ID) JOIN CLASS_STUDENT C ON (A.STUD_ID=C.STUD_ID) WHERE C.SUB_CODE = $sub_code and c.s_id = $sid ORDER  BY  A.STUD_ID";
+                                                $query = "SELECT DISTINCT(A.STUD_ID),B.FIRSTNAME,B.MIDDLENAME,B.LASTNAME FROM STUDENT A JOIN STUDENT_PERSONAL B ON(A.STUD_ID=B.STUD_ID) JOIN CLASS_STUDENT C ON (A.STUD_ID=C.STUD_ID) WHERE C.SUB_CODE = $sub_code and c.s_id = $sid ORDER  BY  B.LASTNAME";
                                               
                                                 $statement = oci_parse($conn, $query);
                                                 oci_execute($statement);
                                                 $spreadsheet = new Spreadsheet();
                                                 $sheet = $spreadsheet->getActiveSheet();
                                                 $sheet->setCellValue('A1', 'STUDENT ID');
-                                                $sheet->setCellValue('B1', 'FIRSTNAME');
+                                                $sheet->setCellValue('B1', 'LASTNAME');
                                                 $sheet->setCellValue('C1', 'MIDDLENAME');
-                                                $sheet->setCellValue('D1', 'LASTNAME');
+                                                $sheet->setCellValue('D1', 'FIRSTNAME');
                                                 $directoryPath = 'C:\ACADEMIX\\' . $school . '\generated_reports\class_list\\';
                                                 if (!is_dir($directoryPath)) {
                                                     if (!mkdir($directoryPath, 0777, true)) {
                                                         die('Failed to create directories.');
                                                     }
                                                 }
-                                                $filePath = $directoryPath . 'class.xlsx';
+                                                $filePath = $directoryPath .'CLASS LIST FOR '. $class_name.'.xlsx';
 
                                                 $row = 2;
                                                 while ($row_data = oci_fetch_assoc($statement)) {
                                                     $sheet->setCellValue('A' . $row, $row_data['STUD_ID']);
-                                                    $sheet->setCellValue('B' . $row, $row_data['FIRSTNAME']);
+                                                    $sheet->setCellValue('B' . $row, $row_data['LASTNAME']);
                                                     $sheet->setCellValue('C' . $row, $row_data['MIDDLENAME']);
-                                                    $sheet->setCellValue('D' . $row, $row_data['LASTNAME']);
+                                                    $sheet->setCellValue('D' . $row, $row_data['FIRSTNAME']);
                                                     $row++;
                                                 }
                                                 $writer = new Xlsx($spreadsheet);
                                                 // Output the Excel file
                                                 $writer->save($filePath);
                                                 $_SESSION['path'] = $filePath;
-                                                $_SESSION['filename'] = 'class.xlsx';
+                                                $_SESSION['file'] = 'CLASS LIST FOR '. $class_name.'.xlsx';
                                                 $_SESSION['redirect']='show_class.php';
-                                                header('Location: download_excels.php');
+                                                header('Location: download_excel.php');
                                                 ?><div style="font-size:15px;
                                 color: green;
                                 position: relative;
@@ -711,7 +711,18 @@ include('auto_logout.php');
                                     ?>
                                     </div>
                                     <div style="display: flex;">
-                         
+                                        <button style=" display: inline-block;
+  padding: 6px 12px;
+  background-color: #909290;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  margin-top:10px;
+  margin-bottom:10px;
+  text-decoration: none;" name="generates" type="submit">
+                                            GENERATE EXCEL REPORT OF CLASS
+                                            <i class="uil uil-file-export"></i>
+                                        </button>
                                     </div>
 
                                     <?php

@@ -16,21 +16,7 @@ session_start();
 $school =  $_SESSION['school'];
 $sid = $_SESSION['sid'];
 ?>
- <style>
-            .card {
-                background-color: #909290;
-                border-radius: 10px;
-                padding: 20px;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-                margin: 20px;
-            }
-
-            .card h2 {
-                color: white;
-                text-align: center;
-                font-size: 25px;
-            }
-        </style>
+   
 <body>
     <?php
     // Include the auto_logout.php file
@@ -173,32 +159,57 @@ $sid = $_SESSION['sid'];
                         <li class="item">
                             <a href="assign_student.php">Enroll Student</a>
                         </li>
+
+
                     </ul>
                 </li>
-
-
                 <li class="item">
                     <div class="submenu-item">
-                        <span>Student Grade Management</span>
+                        <span>
+                            Student Marks And Report
+                        </span>
                         <span class="fas fa-caret-down first"></span>
                     </div>
-
                     <ul class="menu-items submenu">
                         <div class="menu-title">
                             <span class="fas fa-caret-down first"></span>
-                            Student Grade Management
+                            Student Marks And Report
                         </div>
+                        
+                        <li class="item">
+                            <a href="select_mark_approval.php">Mark Approval</a>
+                        </li>
+                        <li class="item">
+                            <a href="select_promote.php">Promotion</a>
+                        </li>
                         <li class="item">
                             <a href="report.php">Generate Mass Student Term Report Card</a>
                         </li>
+
                         <li class="item">
                             <a href="select_class_compile.php">Compile Student GPA</a>
                         </li>
                         <li class="item">
-                            <a href="select_class_report.php">Generate Student Term Report Card</a>
+                            <a href="#">Recompile Student GPA</a>
                         </li>
                         <li class="item">
-                            <a href="transcript">Transcript</a>
+                            <a href="select_class_report.php">Generate Student Term Report Card</a>
+                        </li>
+                       
+                        <li class="item">
+                            <a href="select_term.php">Generate Student Report Per Term</a>
+                        </li>
+                        <li class="item">
+                            <a href="select_single_term.php">Generate Single Student Report Per Term</a>
+                        </li>
+                        <li class="item">
+                            <a href="select_reprint.php">Student Report Reprint</a>
+                        </li>
+                        <li class="item">
+                            <a href="search_by_name.php">Generate Student Transcript</a>
+                        </li>
+                        <li class="item">
+                            <a href="search_by_name_testimonial.php">Generate Student Transcript Testimonial</a>
                         </li>
                         <li class="item">
                             <a href="Marks.php">Generate Report For Missing Marks</a>
@@ -207,14 +218,13 @@ $sid = $_SESSION['sid'];
                             <a href="select_unprocess.php">UnProcessed Marks</a>
                         </li>
                         <li class="item">
-                            <a href="select_uncumulate.php">UnCumulated Marks</a>
+                            <a href="select_uncumulate.php">UnVerified Marks</a>
                         </li>
                         <li class="item">
                             <a href="top_students.php">Top Students</a>
                         </li>
                     </ul>
                 </li>
-
                 <li class="item">
                     <div class="submenu-item">
                         <span>Grade Management</span>
@@ -253,8 +263,8 @@ $sid = $_SESSION['sid'];
         <h1>Academix:School Management System</h1>
         <h1><?php echo $school; ?></h1>
         <?php
-        $stmt = oci_parse($conn, "select * from school where s_id = $sid ");
-
+        $stmt = oci_parse($conn, "select * from school where school = :name");
+        oci_bind_by_name($stmt, ':name', $school);
         oci_execute($stmt);
         if ($rowS = oci_fetch_array($stmt)) {
             $imageData = $rowS['LOGO']->load(); // Load OCILob data
@@ -265,15 +275,28 @@ $sid = $_SESSION['sid'];
 
                                                                         echo '<img src="data:image/png;base64,' . $base64Image . '" alt="Image" style="width: 100px; height: 100px;">'; ?></td> <?php
                                                                                                                                                                                             }
-                                                                                                                                                                                                ?>
-
-        <div class="card">
+                                                                                                                                                                                            
+                       echo  ' <style>
+                       .card {
+                           background-color: #909290;
+                           border-radius: 10px;
+                           padding: 20px;
+                           box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                           margin: 20px;
+                       }
+                       .card h2 {
+                           color: white;
+                           text-align: center;
+                           font-size: 25px;
+                       }
+                   </style>'  ;                                                                                                                                                                       ?>
+ <div class="card">
             <h2>Academic Year</h2>
             <?php
-            $sql = oci_parse($conn, "select * from academic_calendar  where s_id = $sid and start_dt is not null and end_dt is not null ");
+            $sql = oci_parse($conn, "select * from academic_calendar  where s_id = 3 and status ='ACCEPTED' ");
             oci_execute($sql);
             if (oci_fetch_all($sql, $a) > 0) {
-                $sql = oci_parse($conn, "select CEIL(TO_DATE(END_DT, 'YYYY-MM-DD') - SYSDATE) AS DAYS_BETWEEN ,START_DT,END_DT,ACADEMIC_YEAR from academic_calendar where s_id = $sid and start_dt is not null and end_dt is not null order by academic_year");
+                $sql = oci_parse($conn, "select CEIL(TO_DATE(END_DT, 'YYYY-MM-DD') - SYSDATE) AS DAYS_BETWEEN ,START_DT,END_DT,ACADEMIC_YEAR from academic_calendar where s_id = $sid and status ='ACCEPTED' order by academic_year");
                 oci_execute($sql);
                 if ($r = oci_fetch_array($sql)) {
                     $start_dt = $r['START_DT'];
@@ -299,10 +322,10 @@ $sid = $_SESSION['sid'];
         <div class="card">
             <h2>Term</h2>
             <?php
-            $sql = oci_parse($conn, "select * from term_calendar  where s_id = $sid and start_dt is not null and end_dt is not null ");
+            $sql = oci_parse($conn, "select * from term_calendar  where s_id = $sid and status ='ACCEPTED' ");
             oci_execute($sql);
             if (oci_fetch_all($sql, $a) > 0) {
-                $sql = oci_parse($conn, "select CEIL(TO_DATE(END_DT, 'YYYY-MM-DD') - SYSDATE) AS DAYS_BETWEEN ,START_DT,END_DT,TERM from term_calendar where s_id = $sid and start_dt is not null and end_dt is not null order by term desc");
+                $sql = oci_parse($conn, "select CEIL(TO_DATE(END_DT, 'YYYY-MM-DD') - SYSDATE) AS DAYS_BETWEEN ,START_DT,END_DT,TERM from term_calendar where s_id = $sid and status ='ACCEPTED' order by term desc");
                 oci_execute($sql);
                 if ($r = oci_fetch_array($sql)) {
                     $start_dt = $r['START_DT'];

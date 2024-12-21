@@ -114,10 +114,10 @@ $user = $_SESSION['username'];
         <div class="card">
             <h2>Academic Year</h2>
             <?php
-            $sql = oci_parse($conn, "select * from academic_calendar  where s_id = $sid and start_dt is not null and end_dt is not null ");
+            $sql = oci_parse($conn, "select * from academic_calendar  where s_id = $sid and status ='ACCEPTED' ");
             oci_execute($sql);
             if (oci_fetch_all($sql, $a) > 0) {
-                $sql = oci_parse($conn, "select CEIL(TO_DATE(END_DT, 'YYYY-MM-DD') - SYSDATE) AS DAYS_BETWEEN ,START_DT,END_DT,ACADEMIC_YEAR from academic_calendar where s_id = $sid and start_dt is not null and end_dt is not null order by academic_year");
+                $sql = oci_parse($conn, "select CEIL(TO_DATE(END_DT, 'YYYY-MM-DD') - SYSDATE) AS DAYS_BETWEEN ,START_DT,END_DT,ACADEMIC_YEAR from academic_calendar where s_id = $sid and status ='ACCEPTED' order by academic_year");
                 oci_execute($sql);
                 if ($r = oci_fetch_array($sql)) {
                     $start_dt = $r['START_DT'];
@@ -143,10 +143,10 @@ $user = $_SESSION['username'];
         <div class="card">
             <h2>Term</h2>
             <?php
-            $sql = oci_parse($conn, "select * from term_calendar  where s_id = $sid and start_dt is not null and end_dt is not null ");
+            $sql = oci_parse($conn, "select * from term_calendar  where s_id = $sid and status ='ACCEPTED' ");
             oci_execute($sql);
             if (oci_fetch_all($sql, $a) > 0) {
-                $sql = oci_parse($conn, "select CEIL(TO_DATE(END_DT, 'YYYY-MM-DD') - SYSDATE) AS DAYS_BETWEEN ,START_DT,END_DT,TERM from term_calendar where s_id = $sid and start_dt is not null and end_dt is not null order by term desc");
+                $sql = oci_parse($conn, "select CEIL(TO_DATE(END_DT, 'YYYY-MM-DD') - SYSDATE) AS DAYS_BETWEEN ,START_DT,END_DT,TERM from term_calendar where s_id = $sid and status ='ACCEPTED' order by term desc");
                 oci_execute($sql);
                 if ($r = oci_fetch_array($sql)) {
                     $start_dt = $r['START_DT'];

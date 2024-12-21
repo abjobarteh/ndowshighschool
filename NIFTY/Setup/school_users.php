@@ -42,7 +42,7 @@
                 </div>
                         <button style=" display: inline-block;
   padding: 6px 12px;
-  background-color: #1D5B79;
+  background-color: #909290;
   color: white;
   border: none;
   border-radius: 4px;
@@ -94,7 +94,7 @@
     overflow: hidden;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
             <thead>
-                <tr style="  background-color: #1D5B79;
+                <tr style="  background-color: #909290;
     color: #ffffff;
     text-align: left;
     font-weight: bold;">

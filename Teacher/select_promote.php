@@ -26,9 +26,9 @@ include('auto_logout.php');
 
   <div class="wrapper">
     <div class="com">
-      <h3 class="title" style="justify-content:center; text-align:center; color:#1D5B79; 	font-size: 18px;">Welcome To Academix
+      <h3 class="title" style="justify-content:center; text-align:center; color:#909290; 	font-size: 18px;">Welcome To Academix
       </h3>
-      <h3 class="title" style="justify-content:center; text-align:center; color:#1D5B79; 	font-size: 18px;"><?php echo $school ?>
+      <h3 class="title" style="justify-content:center; text-align:center; color:#909290; 	font-size: 18px;"><?php echo $school ?>
       </h3>
       <?php
       $stmt = oci_parse($conn, "select * from school where school = :name");

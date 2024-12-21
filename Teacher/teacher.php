@@ -45,6 +45,8 @@ $sid = $_SESSION['sid'];
             <ul class="menu-items">
                 <div class="menu-title">Teacher</div>
 
+
+<!--    
                 <li class="item">
                     <div class="submenu-item">
                         <span>Course Administration</span>
@@ -63,9 +65,7 @@ $sid = $_SESSION['sid'];
                             <a href="select_subject_grade.php">Grade Settings</a>
                         </li>
                     </ul>
-                </li>
-
-                <li class="item">
+                </li>  <li class="item">
                     <div class="submenu-item">
                         <span>Class Administration</span>
                         <span class="fas fa-caret-down first"></span>
@@ -86,7 +86,7 @@ $sid = $_SESSION['sid'];
                             <a href="promotion.php">Promotion</a>
                         </li>
                     </ul>
-                </li>
+                </li> -->
                 <li class="item">
                     <div class="submenu-item">
                         <span>Student Grades</span>
@@ -146,10 +146,10 @@ $sid = $_SESSION['sid'];
    <div class="card">
             <h2>Academic Year</h2>
             <?php
-            $sql = oci_parse($conn, "select * from academic_calendar  where s_id = $sid and start_dt is not null and end_dt is not null ");
+            $sql = oci_parse($conn, "select * from academic_calendar  where s_id = $sid and status ='ACCEPTED' ");
             oci_execute($sql);
             if (oci_fetch_all($sql, $a) > 0) {
-                $sql = oci_parse($conn, "select CEIL(TO_DATE(END_DT, 'YYYY-MM-DD') - SYSDATE) AS DAYS_BETWEEN ,START_DT,END_DT,ACADEMIC_YEAR from academic_calendar where s_id = $sid and start_dt is not null and end_dt is not null order by academic_year");
+                $sql = oci_parse($conn, "select CEIL(TO_DATE(END_DT, 'YYYY-MM-DD') - SYSDATE) AS DAYS_BETWEEN ,START_DT,END_DT,ACADEMIC_YEAR from academic_calendar where s_id = $sid and status ='ACCEPTED' order by academic_year");
                 oci_execute($sql);
                 if ($r = oci_fetch_array($sql)) {
                     $start_dt = $r['START_DT'];
@@ -175,10 +175,10 @@ $sid = $_SESSION['sid'];
         <div class="card">
             <h2>Term</h2>
             <?php
-            $sql = oci_parse($conn, "select * from term_calendar  where s_id = $sid and start_dt is not null and end_dt is not null ");
+            $sql = oci_parse($conn, "select * from term_calendar  where s_id = $sid and status ='ACCEPTED' ");
             oci_execute($sql);
             if (oci_fetch_all($sql, $a) > 0) {
-                $sql = oci_parse($conn, "select CEIL(TO_DATE(END_DT, 'YYYY-MM-DD') - SYSDATE) AS DAYS_BETWEEN ,START_DT,END_DT,TERM from term_calendar where s_id = $sid and start_dt is not null and end_dt is not null order by term desc");
+                $sql = oci_parse($conn, "select CEIL(TO_DATE(END_DT, 'YYYY-MM-DD') - SYSDATE) AS DAYS_BETWEEN ,START_DT,END_DT,TERM from term_calendar where s_id = $sid and status ='ACCEPTED' order by term desc");
                 oci_execute($sql);
                 if ($r = oci_fetch_array($sql)) {
                     $start_dt = $r['START_DT'];

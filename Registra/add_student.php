@@ -549,11 +549,11 @@ include 'connect.php'; ?>
                 $class = $r['CLASS'];
             }
             if ($class == '10') {
-                $currentDate = '2324';
+                $currentDate = '2425';
             } else if ($class == '11') {
-                $currentDate = '2223';
+                $currentDate = '2423';
             } else if ($class == '12') {
-                $currentDate = '2122';
+                $currentDate = '2322';
             }
             $sql = oci_parse($conn, "insert into SGEN_ID (GEN) values (1)");
             oci_execute($sql);

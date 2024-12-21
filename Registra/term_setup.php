@@ -268,6 +268,54 @@ include('auto_logout.php');
                     <i class="uil uil-file-export"></i>
                 </button>
             </div>
+
+            
+            <Label style="font-size: 18px; font-family: sans-serif;
+    font-weight: bold; color: #909290;">Define Term</Label>
+                <div class="input-container" style="display: flex;">
+                    <div class="input-field" style="margin-right: 10px;">
+                        <label>Academic Year</label>
+                        <select required name="acad_year">
+                            <option disabled selected>Select Academic Year</option>
+                            <?php
+                            $get_hos = "select * from academic_calendar WHERE S_ID= $sid and status = 'ACCEPTED' ";
+                            $get = oci_parse(oci_connect($username, $password, $connection), $get_hos);
+                            oci_execute($get);
+                            while ($row = oci_fetch_array($get)) {
+                            ?><option>
+                                    <?php echo $row["ACADEMIC_YEAR"]; ?>
+                                </option> <?php
+                                        }
+                                            ?>
+                        </select>
+                    </div>
+                    <div class="input-field" style="margin-right: 10px;">
+                        <label>Term</label>
+                        <input type="number" placeholder="Enter Term Title" title="Only Numbers" name="term" style="width:250px;" min=1 and max=3>
+                    </div>
+                    <div class="input-field" style="margin-right: 10px;">
+                        <label>Term Start Date</label>
+                        <input type="date" placeholder="Enter Academic Title" title="Only Letters And Numbers" name="start" style="width:150px;">
+                    </div>
+                    <div class="input-field" style="margin-right: 10px;">
+                        <label>Term End Date</label>
+                        <input type="date" placeholder="Enter Academic Title" title="Only Letters And Numbers" name="end" style="width:150px;" min="<?php echo date('Y-m-d', strtotime('+1 day')); ?>">
+                    </div>
+                </div>
+                <div style="display: flex;">
+                    <button style=" display: inline-block;
+  padding: 6px 12px;
+  background-color: #909290;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  margin-top:10px;
+  margin-bottom:10px;
+  text-decoration: none;" name="establish" type="submit">
+                        Define Term
+                        <i class="uil uil-create-dashboard"></i>
+                    </button>
+                </div>
             <?php
 
             require('tcpdf/tcpdf.php');

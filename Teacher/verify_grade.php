@@ -110,8 +110,8 @@ include('auto_logout.php');
             <?php
 
 
-
-            $sql = oci_parse($conn, "select * from academic_calendar a join term_calendar b on (a.academic_year=b.academic_year) where b.start_dt is not null");
+$term =    $_SESSION['term'];
+            $sql = oci_parse($conn, "select * from academic_calendar a join term_calendar b on (a.academic_year=b.academic_year) where b.term='$term'");
             oci_execute($sql);
             if ($row = oci_fetch_array($sql)) {
                 $a_y = $row['ACADEMIC_YEAR'];
@@ -234,6 +234,7 @@ include('auto_logout.php');
             if (isset($_POST['enroll']) && !empty($_POST['enroll'])) {
                 $selectedStudentIds = $_POST['enroll'];
                 foreach ($selectedStudentIds as $studentId) {
+               //    echo "UPDATE STUDENT_EVALUATION SET MARK_STATUS = 'ACCEPTED' WHERE S_ID = $sid AND MARK_STATUS = 'PENDING' and CLASS_CODE = $s_code AND SUB_CODE = $sub_code AND EMP_ID = '$emp_id' AND STUD_ID = '$studentId' and term = '$t' ";
                     $sql = oci_parse($conn, "UPDATE STUDENT_EVALUATION SET MARK_STATUS = 'ACCEPTED' WHERE S_ID = $sid AND MARK_STATUS = 'PENDING' and CLASS_CODE = $s_code AND SUB_CODE = $sub_code AND EMP_ID = '$emp_id' AND STUD_ID = '$studentId' and term = '$t' ");
 
                     if (oci_execute($sql)) {
@@ -294,7 +295,7 @@ include('auto_logout.php');
                                });
                              </script>';
                         //    echo "STUDENT MARK ACCEPTED";
-                            header("refresh:2;");
+                           header("refresh:2;");
                             ?>
                         </div> <?php
                             } else {

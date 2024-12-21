@@ -94,7 +94,7 @@
     overflow: hidden;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);">
             <thead>
-                <tr style="  background-color: #1D5B79;
+                <tr style="  background-color: #909290;
     color: #ffffff;
     text-align: left;
     font-weight: bold;">

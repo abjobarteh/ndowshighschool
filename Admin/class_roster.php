@@ -9,22 +9,6 @@
     <link rel="stylesheet" href="css/show_users.css">
     <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <link href="https://fonts.googleapis.com/css?family=Poppins:600&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/a81368914c.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" type="text/css" href="https://common.olemiss.edu/_js/sweet-alert/sweet-alert.css" />
 </head>
 <?php
 include 'connect.php';
@@ -85,20 +69,25 @@ include('auto_logout.php');
             </button>
         </div>
         <header>Class Roster</header>
-        <select required name="classname">
-            <option disabled selected>Select Class</option>
-            <?php
-            $get_hos = "SELECT DISTINCt(B.CLASS_NAME),A.SUB_CODE FROM CLASS_STUDENT A JOIN SUB_CLASS B ON (A.SUB_CODE=B.SUB_CODE) ORDER BY B.CLASS_NAME ";
-            $get = oci_parse(oci_connect($username, $password, $connection), $get_hos);
-            oci_execute($get);
-            while ($row = oci_fetch_array($get)) {
-            ?><option value="<?php echo $row['SUB_CODE'] ?>">
-                    <?php echo trim($row["CLASS_NAME"]); ?>
-                </option> <?php
-                        }
-                            ?>
-        </select>
 
+
+        <div class="input-container" style="display: flex;">
+
+            <select required name="class_name">
+                <option disabled selected>Select Class</option>
+                <?php
+                $get_hos = "SELECT DISTINCt(B.CLASS_NAME),A.SUB_CODE FROM CLASS_STUDENT A JOIN SUB_CLASS B ON (A.SUB_CODE=B.SUB_CODE) ORDER BY B.CLASS_NAME ";
+                $get = oci_parse(oci_connect($username, $password, $connection), $get_hos);
+                oci_execute($get);
+                while ($row = oci_fetch_array($get)) {
+                ?><option value="<?php echo $row['SUB_CODE'] ?>">
+                        <?php echo trim($row["CLASS_NAME"]); ?>
+                    </option> <?php
+                            }
+                                ?>
+            </select>
+
+       
         </div>
         <button style=" display: inline-block;
   padding: 6px 12px;
@@ -107,54 +96,40 @@ include('auto_logout.php');
   border: none;
   border-radius: 4px;
   text-decoration: none;" name="filter" type="submit">
-            FILTER
+                FILTER
 
-            <i class="uil uil-filter"></i>
-        </button>
+                <i class="uil uil-filter"></i>
+            </button>
         <?php
-
         if (isset($_POST['filter'])) {
-            if (isset($_POST['reg'])) {
+            if (isset($_POST['class_name'])) {
                 echo  '<script>
-                Swal.fire({
-                    position: "center",
-                    icon: "info",
-                    title: "FILTERING INFORMATION",
-                    showConfirmButton: false,
-                    timer: 1500
-                  });
-                </script>';
+        Swal.fire({
+            position: "center",
+            icon: "info",
+            title: "FILTERING INFORMATION",
+            showConfirmButton: false,
+            timer: 1500
+          });
+        </script>';
 
-                $stuid = $_POST['reg'];
-            } else if (isset($_POST['classname'])) {
-                echo  '<script>
-                Swal.fire({
-                    position: "center",
-                    icon: "info",
-                    title: "FILTERING INFORMATION",
-                    showConfirmButton: false,
-                    timer: 1500
-                  });
-                </script>';
-
-                $sub_cd = $_POST['classname'];
-            } else {
+                $sub_cd = $_POST['class_name'];
+            }else{
                 echo  '<script>
                 Swal.fire({
                     position: "center",
                     icon: "warning",
-                    title: "SELECT STUDENT",
+                    title: "SELECT CLASS",
                     showConfirmButton: false,
                     timer: 1500
                   });
                 </script>';
             }
         }
-        ?>
-        <?php
+
 
         $sql = "SELECT * FROM STUDENT A JOIN CLASS_STUDENT B ON (A.STUD_ID=B.STUD_ID) JOIN STUDENT_PERSONAL C ON (A.STUD_ID=C.STUD_ID) WHERE B.SUB_CODE = $sub_cd and A.STATUS !='GRADUATED' and A.S_ID = $sid ORDER BY A.NAME";
-       //  echo $sql;
+        //  echo $sql;
         $stidd = oci_parse($conn, $sql);
         oci_execute($stidd);
         ?>
@@ -192,9 +167,24 @@ include('auto_logout.php');
             <label>Report Type</label>
             <select required name="report_type">
                 <option disabled selected>Select Report Type</option>
-                <option>EXCEL</option>
 
+                <option>EXCEL</option>
             </select>
+            <label>Class</label>
+            <select required name="classname">
+                <option disabled selected>Select Class</option>
+                <?php
+                $get_hos = "SELECT DISTINCt(B.CLASS_NAME),A.SUB_CODE FROM CLASS_STUDENT A JOIN SUB_CLASS B ON (A.SUB_CODE=B.SUB_CODE) ORDER BY B.CLASS_NAME ";
+                $get = oci_parse(oci_connect($username, $password, $connection), $get_hos);
+                oci_execute($get);
+                while ($row = oci_fetch_array($get)) {
+                ?><option value="<?php echo $row['SUB_CODE'] ?>">
+                        <?php echo trim($row["CLASS_NAME"]); ?>
+                    </option> <?php
+                            }
+                                ?>
+            </select>
+
             <label>Generate By Gender</label>
             <select required name="gender">
                 <option disabled selected>Select Gender</option>
@@ -224,7 +214,7 @@ include('auto_logout.php');
                 if (isset($_POST['report_type'])) {
                     $rpt_type = $_POST['report_type'];
                     if ($rpt_type == 'PDF') {
-
+                       $s_code = $_POST['classname'];
                         $sql = oci_parse($conn, "select * from sub_class where sub_code = $s_code ");
                         oci_execute($sql);
                         while ($r = oci_fetch_array($sql)) {
@@ -486,7 +476,7 @@ include('auto_logout.php');
                             }
                         } else if ($rpt_type == 'EXCEL') {
 
-                            $class_name = $_POST['class_name'];
+                            $s_code = $_POST['classname'];
                             $sql = oci_parse($conn, "select * from sub_class where sub_code = '$s_code' ");
                             oci_execute($sql);
                             while ($r = oci_fetch_array($sql)) {
@@ -495,16 +485,16 @@ include('auto_logout.php');
                             }
                             if (isset($_POST['gender'])) {
                                 $gender = $_POST['gender'];
-                                $query = "SELECT DISTINCT(A.STUD_ID),B.FIRSTNAME,B.MIDDLENAME,B.LASTNAME FROM academix.STUDENT A JOIN academix.STUDENT_PERSONAL B ON(A.STUD_ID=B.STUD_ID) JOIN academix.CLASS_STUDENT C ON (A.STUD_ID=C.STUD_ID) WHERE C.SUB_CODE = $sub_code and c.s_id = $sid and b.gender ='$gender' ORDER  BY  A.STUD_ID";
+                                $query = "SELECT DISTINCT(A.STUD_ID),B.FIRSTNAME,B.MIDDLENAME,B.LASTNAME FROM STUDENT A JOIN STUDENT_PERSONAL B ON(A.STUD_ID=B.STUD_ID) JOIN CLASS_STUDENT C ON (A.STUD_ID=C.STUD_ID) WHERE C.SUB_CODE = $sub_code and c.s_id = $sid and b.gender ='$gender' ORDER  BY  B.LASTNAME";
                                 // Prepare and execute the query
                                 $statement = oci_parse($conn, $query);
                                 oci_execute($statement);
                                 $spreadsheet = new Spreadsheet();
                                 $sheet = $spreadsheet->getActiveSheet();
                                 $sheet->setCellValue('A1', 'STUDENT ID');
-                                $sheet->setCellValue('B1', 'FIRSTNAME');
+                                $sheet->setCellValue('D1', 'FIRSTNAME');
                                 $sheet->setCellValue('C1', 'MIDDLENAME');
-                                $sheet->setCellValue('D1', 'LASTNAME');
+                                $sheet->setCellValue('B1', 'LASTNAME');
                                 $directoryPath = 'C:\ACADEMIX\\' . $school . '\generated_reports\teacher_class_list\\';
                                 if (!is_dir($directoryPath)) {
                                     if (!mkdir($directoryPath, 0777, true)) {
@@ -515,18 +505,14 @@ include('auto_logout.php');
                                 $row = 2;
                                 while ($row_data = oci_fetch_assoc($statement)) {
                                     $sheet->setCellValue('A' . $row, $row_data['STUD_ID']);
-                                    $sheet->setCellValue('B' . $row, $row_data['FIRSTNAME']);
+                                    $sheet->setCellValue('D' . $row, $row_data['FIRSTNAME']);
                                     $sheet->setCellValue('C' . $row, $row_data['MIDDLENAME']);
-                                    $sheet->setCellValue('D' . $row, $row_data['LASTNAME']);
+                                    $sheet->setCellValue('B' . $row, $row_data['LASTNAME']);
                                     $row++;
                                 }
                                 $writer = new Xlsx($spreadsheet);
                                 // Output the Excel file
-                                $writer->save($filePath);
-                                $_SESSION['path'] = $filePath;
-                                $_SESSION['filename'] = $name . '_class.xlsx';
-                                $_SESSION['redirect'] = 'class_roster.php';
-                                header('Location: download_excels.php');
+                                $writer->save($filePath)
                                 ?><div style="font-size:15px;
                                 color: green;
                                 position: relative;
@@ -539,38 +525,41 @@ include('auto_logout.php');
                                             oci_free_statement($statement);
                                             oci_close($conn);
                                         } else {
-                                            $query = "SELECT DISTINCT(A.STUD_ID),B.FIRSTNAME,B.MIDDLENAME,B.LASTNAME FROM academix.STUDENT A JOIN academix.STUDENT_PERSONAL B ON(A.STUD_ID=B.STUD_ID) JOIN academix.CLASS_STUDENT C ON (A.STUD_ID=C.STUD_ID) WHERE C.SUB_CODE = $sub_code and c.s_id = $sid and b.gender ='$gender' AND A.STATUS = 'ENROLLED' ORDER  BY  A.STUD_ID";
+                                            $query = "SELECT DISTINCT(A.STUD_ID),B.FIRSTNAME,B.MIDDLENAME,B.LASTNAME FROM STUDENT A JOIN STUDENT_PERSONAL B ON(A.STUD_ID=B.STUD_ID) JOIN CLASS_STUDENT C ON (A.STUD_ID=C.STUD_ID) WHERE C.SUB_CODE = $s_code  ORDER  BY  B.LASTNAME";
                                             // Prepare and execute the query
                                             $statement = oci_parse($conn, $query);
                                             oci_execute($statement);
                                             $spreadsheet = new Spreadsheet();
                                             $sheet = $spreadsheet->getActiveSheet();
                                             $sheet->setCellValue('A1', 'STUDENT ID');
-                                            $sheet->setCellValue('B1', 'FIRSTNAME');
+                                            $sheet->setCellValue('D1', 'FIRSTNAME');
                                             $sheet->setCellValue('C1', 'MIDDLENAME');
-                                            $sheet->setCellValue('D1', 'LASTNAME');
+                                            $sheet->setCellValue('B1', 'LASTNAME');
                                             $directoryPath = 'C:\ACADEMIX\\' . $school . '\generated_reports\teacher_class_list\\';
                                             if (!is_dir($directoryPath)) {
                                                 if (!mkdir($directoryPath, 0777, true)) {
                                                     die('Failed to create directories.');
                                                 }
                                             }
-                                            $filePath = $directoryPath . $name . '_class.xlsx';
+                                            $outputFilePath = $directory .'CLASS LIST FOR '. $class_name. '.xlsx';
                                             $row = 2;
                                             while ($row_data = oci_fetch_assoc($statement)) {
                                                 $sheet->setCellValue('A' . $row, $row_data['STUD_ID']);
-                                                $sheet->setCellValue('B' . $row, $row_data['FIRSTNAME']);
+                                                $sheet->setCellValue('D' . $row, $row_data['FIRSTNAME']);
                                                 $sheet->setCellValue('C' . $row, $row_data['MIDDLENAME']);
-                                                $sheet->setCellValue('D' . $row, $row_data['LASTNAME']);
+                                                $sheet->setCellValue('B' . $row, $row_data['LASTNAME']);
                                                 $row++;
                                             }
                                             $writer = new Xlsx($spreadsheet);
                                             // Output the Excel file
-                                            $writer->save($filePath);
-                                            $_SESSION['path'] = $filePath;
-                                            $_SESSION['filename'] = $name . '_class.xlsx';
+                                            $writer->save($outputFilePath);
+                                            $_SESSION['path'] = $outputFilePath;
+                                            $_SESSION['filename'] = 'CLASS LIST FOR '. $class_name. '.xlsx';
                                             $_SESSION['redirect'] = 'class_roster.php';
-                                            header('Location: download_excels.php');
+                        
+                                            // Redirect to download_excel.php
+                                            header("Location: download_excel.php");
+                                            header("refresh:2;"); ?>
                                             ?><div style="font-size:15px;
                                 color: green;
                                 position: relative;
